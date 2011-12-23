@@ -1,0 +1,26 @@
+; Locally Optimal Nanopond Solution
+; from: http://lukepalmer.wordpress.com/2007/06/27/locally-optimal-nanopond-solution/
+; Auther: Luke Palmer
+  1
+  READG
+  SHARE
+  WRITEB
+  INC
+  SHARE
+  TURN
+  READG
+  SHARE
+  DEC
+  WRITEG
+  TURN
+  READG
+  SHARE
+  LOOP
+    FWD
+    SHARE
+    KILL
+    READG
+    WRITEB
+  REP
+  XCHG 0
+  STOP

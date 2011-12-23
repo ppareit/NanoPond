@@ -1,0 +1,21 @@
+NanoPond
+
+DISCRIPTION
+===========
+
+This is NanoPond, an artificial life simulator for Android.
+
+NanoPond runs a virtual machine in which 'life' can develop. This virtual machine is a port of a java program by Thomas Abeel, who in turn based his virtual machine on the c code of Adam Ierymenko. NanoPond was used in a Computational Intelligence course at the university of Ghent.
+
+WHAT IS DONE, AND WHAT NOT
+==========================
+The virtual machine is complete an is adapted to be multi threaded. It can run concurrently on multiple cores. The graphical display of the nanopond world is complete and will run in its own thread. The extra GUI code is not complete. More statistics must be displayed and the code to modify single cells is not yet added. Those should be trivial additions. Some artwork like an icon should be added also.
+
+LICENSE
+=======
+This program is released under the GNU Public License Version 3.
+The programs on which it is based where released under the GPL 2.
+
+CONTACT
+=======
+You can mail(pieter.pareit@gmail.com) me with any comment, suggestion or correction.
