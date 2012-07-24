@@ -1,6 +1,7 @@
 package be.ppareit.nanopond;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
@@ -59,7 +60,15 @@ public class NanoPondActivity extends Activity {
                 // make invisible
                 v.setVisibility(View.INVISIBLE);
                 // the dragshadowbuilder will display an outline
-                v.startDrag(null, new View.DragShadowBuilder(v), v, 0);
+                v.startDrag(null, new View.DragShadowBuilder(v) {
+                    @Override
+                    public void onProvideShadowMetrics(Point shadowSize,
+                            Point shadowTouchPoint) {
+                        super.onProvideShadowMetrics(shadowSize,
+                                shadowTouchPoint);
+                        shadowTouchPoint.y = 10;
+                    }
+                }, v, 0);
                 return true;
             }
         });
