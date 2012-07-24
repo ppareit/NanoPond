@@ -13,41 +13,42 @@ public class NanoPondActivity extends Activity {
 
     private static final String TAG = NanoPondActivity.class.getSimpleName();
 
-    private NanoPond nanopond = null;
+    private NanoPond mNanopond = null;
 
-    private View mainView;
-    private NanoPondView gridView;
+    private View mMainView;
+    private NanoPondView mGridView;
+    private View mRaportView;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        nanopond = new NanoPond();
-        nanopond.run();
+        mNanopond = new NanoPond();
+        mNanopond.run();
 
         setContentView(R.layout.main);
-        mainView = findViewById(R.id.main);
-        gridView = (NanoPondView)findViewById(R.id.nanopond_view);
+        mMainView = findViewById(R.id.main);
+        mGridView = (NanoPondView) findViewById(R.id.nanopond_view);
 
-
-        ListView propertyList = (ListView)findViewById(R.id.property_list);
-        ReportListAdapter rla = new ReportListAdapter(this, nanopond);
+        ListView propertyList = (ListView) findViewById(R.id.property_list);
+        ReportListAdapter rla = new ReportListAdapter(this, mNanopond);
         propertyList.setAdapter(rla);
 
-        final View raportView = findViewById(R.id.report_view);
-        makeViewFloatable(raportView);
-
+        mRaportView = findViewById(R.id.report_view);
+        makeViewFloatable(mRaportView);
 
     }
 
     NanoPond getNanoPond() {
-        return nanopond;
+        return mNanopond;
     }
 
     /**
      * This makes the given existing childView floatable on top of the mainView.
-     * @param childView Child view to make floatable
+     *
+     * @param childView
+     *            Child view to make floatable
      */
     private void makeViewFloatable(View childView) {
         // the child view begins window dragging on a long click
@@ -63,19 +64,20 @@ public class NanoPondActivity extends Activity {
             }
         });
         // the main view repositions the child views
-        mainView.setOnDragListener(new OnDragListener() {
+        mMainView.setOnDragListener(new OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
                 switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED: {
                     Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
-                    // need to return true to keep getting drag/drop related messages
+                    // need to return true to keep getting drag/drop related
+                    // messages
                     return true;
                 }
                 case DragEvent.ACTION_DRAG_ENDED: {
                     Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
                     // the child view is put in the localstate
-                    View cv = (View)event.getLocalState();
+                    View cv = (View) event.getLocalState();
                     // make visible again at the new position
                     cv.setVisibility(View.VISIBLE);
                     return true;
@@ -83,11 +85,13 @@ public class NanoPondActivity extends Activity {
                 case DragEvent.ACTION_DROP: {
                     Log.v(TAG, "onDrag : ACTION_DROP");
                     // the child view is put in the localstate
-                    View cv = (View)event.getLocalState();
-                    // calling setLeft/setTop only works if layout is not yet set
-                    // at 'runtime', we need to use the setTranslationX/Y functions
-                    float dx = event.getX() - cv.getLeft() - cv.getWidth()/2;
-                    float dy = event.getY() - cv.getTop() - cv.getHeight()/2;
+                    View cv = (View) event.getLocalState();
+                    // calling setLeft/setTop only works if layout is not yet
+                    // set
+                    // at 'runtime', we need to use the setTranslationX/Y
+                    // functions
+                    float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
+                    float dy = event.getY() - cv.getTop() - 10;
                     cv.setTranslationX(dx);
                     cv.setTranslationY(dy);
                     return true;
@@ -102,12 +106,26 @@ public class NanoPondActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        gridView.setMode(NanoPondView.State.PAUSED);
+        mGridView.setMode(NanoPondView.State.PAUSED);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        gridView.setMode(NanoPondView.State.RUNNING);
+        mGridView.setMode(NanoPondView.State.RUNNING);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

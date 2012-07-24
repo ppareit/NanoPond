@@ -23,9 +23,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import be.ppareit.android.GameLoopView;
 import be.ppareit.nanopond.NanoPond.Cell;
-
 
 /**
  *
@@ -35,8 +36,7 @@ public class NanoPondView extends GameLoopView {
     static final String TAG = "NanoPondView";
 
     public enum State {
-        RUNNING,
-        PAUSED,
+        RUNNING, PAUSED,
     }
 
     private State mState = State.PAUSED;
@@ -46,12 +46,35 @@ public class NanoPondView extends GameLoopView {
     private Paint mCanvasPaint = null;
     private Paint mBackgroundPaint = null;
 
-    private final int mXOffset = 0;
-    private final int mYOffset = 0;
+    private static final int INVALID_POINTER_ID = -1;
+
+    private int mActivePointerId = INVALID_POINTER_ID;
+    private float mLastTouchX;
+    private float mLastTouchY;
+
+    private int mXOffset = 0;
+    private int mYOffset = 0;
+
+    // Scale calculated to fill screen initially
+    private float mScaleX = 1.0f;
+    private float mScaleY = 1.0f;
+
+    private final Paint mCellPaint = new Paint();
+
+    // Useful paint to display dubugging info on screen
+    private final Paint mDebugPaint = new Paint();
+
+    // Scale by user
+    private ScaleGestureDetector mScaleGestureDetector;
+    private float mScaleFactor = 1.0f;
+
+    // keeps track when the user moves the display
+    boolean mPanInProgress = false;
 
     public NanoPondView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (isInEditMode()) return;
+        if (isInEditMode())
+            return;
 
         mNanoPond = ((NanoPondActivity) context).getNanoPond();
 
@@ -61,8 +84,37 @@ public class NanoPondView extends GameLoopView {
         mBackgroundPaint = new Paint();
         mBackgroundPaint.setColor(Color.BLACK);
 
+        mDebugPaint.setARGB(255, 255, 240, 0);
+        mDebugPaint.setTextSize(32);
 
         setTargetFps(0);
+
+        mScaleGestureDetector = new ScaleGestureDetector(context,
+                new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    @Override
+                    public boolean onScale(ScaleGestureDetector detector) {
+                        final float oldScaleFactor = mScaleFactor;
+                        mScaleFactor *= detector.getScaleFactor();
+                        // limit the scaling
+                        mScaleFactor = Math.max(0.5f, mScaleFactor);
+                        mScaleFactor = Math.min(20.0f, mScaleFactor);
+                        // reposition
+                        // TODO: further improve centerposition
+                        final int cols = NanoPond.POND_SIZE_X;
+                        final int rows = NanoPond.POND_SIZE_Y;
+                        final float focusX = detector.getFocusX();
+                        final float focusY = detector.getFocusY();
+                        final float width = getWidth();
+                        final float height = getHeight();
+                        mXOffset += mScaleX * cols
+                                * (oldScaleFactor - mScaleFactor)
+                                / (width / focusX);
+                        mYOffset += mScaleY * rows
+                                * (oldScaleFactor - mScaleFactor)
+                                / (height / focusY);
+                        return true;
+                    }
+                });
     }
 
     public void setMode(State mode) {
@@ -77,17 +129,96 @@ public class NanoPondView extends GameLoopView {
 
     @Override
     protected void onUpdate() {
-        // the nanopond object runs in its own thread, so no game logic updating needed
+        // the nanopond object runs in its own thread
+        // thus that is updated continuesly
+
+        // try to remove the margins
+        if (mPanInProgress == false) {
+            if (mXOffset > 0) {
+                mXOffset -= mXOffset / 2;
+            }
+            final int cols = NanoPond.POND_SIZE_X;
+            final float rightMargin = getWidth() - mXOffset - cols
+                    * mScaleFactor * mScaleX;
+            if (rightMargin > 0) {
+                mXOffset += rightMargin / 2;
+            }
+            if (mYOffset > 0) {
+                mYOffset -= mYOffset / 2;
+            }
+            final int rows = NanoPond.POND_SIZE_Y;
+            final float bottomMargin = getHeight() - mYOffset - rows
+                    * mScaleFactor * mScaleY;
+            if (bottomMargin > 0) {
+                mYOffset += bottomMargin / 2;
+            }
+        }
     }
 
-    private float mScaleX = 1.0f;
-    private float mScaleY = 1.0f;
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mScaleGestureDetector.onTouchEvent(event);
 
-    private final Paint mCellPaint = new Paint();
+        final int action = event.getAction();
+        switch (action & MotionEvent.ACTION_MASK) {
+        case MotionEvent.ACTION_DOWN: {
+            // started moving the display
+            mPanInProgress = true;
+            // store touch data
+            mLastTouchX = event.getX();
+            mLastTouchY = event.getY();
+            mActivePointerId = event.getPointerId(0);
+            break;
+        }
+        case MotionEvent.ACTION_MOVE: {
+            final int pointerIndex = event.findPointerIndex(mActivePointerId);
+            final float x = event.getX(pointerIndex);
+            final float y = event.getY(pointerIndex);
+
+            if (!mScaleGestureDetector.isInProgress()) {
+                final float dx = x - mLastTouchX;
+                final float dy = y - mLastTouchY;
+
+                mXOffset += dx;
+                mYOffset += dy;
+            }
+
+            mLastTouchX = x;
+            mLastTouchY = y;
+
+            break;
+        }
+        case MotionEvent.ACTION_UP: {
+            mActivePointerId = INVALID_POINTER_ID;
+            mPanInProgress = false;
+            break;
+        }
+        case MotionEvent.ACTION_CANCEL: {
+            mActivePointerId = INVALID_POINTER_ID;
+            mPanInProgress = false;
+            break;
+        }
+        case MotionEvent.ACTION_POINTER_UP: {
+            final int pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+            final int pointerId = event.getPointerId(pointerIndex);
+            if (pointerId == mActivePointerId) {
+                final int newPointerIndex = (pointerIndex == 0 ? 1 : 0);
+                mLastTouchX = event.getX(newPointerIndex);
+                mLastTouchY = event.getY(newPointerIndex);
+                mActivePointerId = event.getPointerId(newPointerIndex);
+            }
+            break;
+        }
+
+        }
+
+        return true;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (isInEditMode()) return;
+        if (isInEditMode())
+            return;
 
         final Cell[][] pond = mNanoPond.pond;
 
@@ -100,17 +231,18 @@ public class NanoPondView extends GameLoopView {
         canvas.save();
         canvas.translate(mXOffset, mYOffset);
         canvas.scale(mScaleX, mScaleY);
+        canvas.scale(mScaleFactor, mScaleFactor);
 
-        canvas.drawRect(0, 0, cols*size, rows*size, mBackgroundPaint);
+        canvas.drawRect(0, 0, cols * size, rows * size, mBackgroundPaint);
 
         for (int c = 0; c < cols; c++) {
             for (int r = 0; r < rows; r++) {
                 final Cell cell = pond[c][r];
                 if (cell.generation > 2 && cell.energy > 0) {
-                    int left = (c*size);
-                    int top = (r*size);
-                    int right = (c*size + size);
-                    int bottom = (r*size + size);
+                    int left = (c * size);
+                    int top = (r * size);
+                    int right = (c * size + size);
+                    int bottom = (r * size + size);
                     mCellPaint.setColor(getColor(pond[c][r]));
                     canvas.drawRect(left, top, right, bottom, mCellPaint);
                 }
@@ -122,15 +254,14 @@ public class NanoPondView extends GameLoopView {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if (isInEditMode()) return;
-        mScaleX = (float)w/NanoPond.POND_SIZE_X;
-        mScaleY = (float)h/NanoPond.POND_SIZE_Y;
+        if (isInEditMode())
+            return;
+        mScaleX = (float) w / NanoPond.POND_SIZE_X;
+        mScaleY = (float) h / NanoPond.POND_SIZE_Y;
     }
 
-
-
-    static int[] artificial = { Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW,
-            Color.RED, Color.MAGENTA };
+    static int[] artificial = { Color.WHITE, Color.GREEN, Color.CYAN,
+            Color.YELLOW, Color.RED, Color.MAGENTA };
 
     static int cap(int i) {
         if (i > 255)
@@ -152,22 +283,6 @@ public class NanoPondView extends GameLoopView {
         return (alpha << 24) | (cap(red) << 16) | (cap(green) << 8) | cap(blue);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
