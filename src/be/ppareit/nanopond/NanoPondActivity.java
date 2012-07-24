@@ -19,6 +19,7 @@ public class NanoPondActivity extends Activity {
     private View mMainView;
     private NanoPondView mGridView;
     private View mRaportView;
+    private View mDetailView;
 
     /** Called when the activity is first created. */
     @Override
@@ -32,12 +33,19 @@ public class NanoPondActivity extends Activity {
         mMainView = findViewById(R.id.main);
         mGridView = (NanoPondView) findViewById(R.id.nanopond_view);
 
-        ListView propertyList = (ListView) findViewById(R.id.property_list);
+        ListView propertyList = (ListView) findViewById(R.id.report_property_list);
         ReportListAdapter rla = new ReportListAdapter(this, mNanopond);
         propertyList.setAdapter(rla);
 
         mRaportView = findViewById(R.id.report_view);
         makeViewFloatable(mRaportView);
+
+        ListView propertyList2 = (ListView) findViewById(R.id.detail_property_list);
+        DetailListAdapter dla = new DetailListAdapter(this, mGridView, mNanopond);
+        propertyList2.setAdapter(dla);
+
+        mDetailView = findViewById(R.id.detail_view);
+        makeViewFloatable(mDetailView);
 
     }
 
@@ -96,8 +104,7 @@ public class NanoPondActivity extends Activity {
                     // the child view is put in the localstate
                     View cv = (View) event.getLocalState();
                     // calling setLeft/setTop only works if layout is not yet
-                    // set
-                    // at 'runtime', we need to use the setTranslationX/Y
+                    // set at 'runtime', we need to use the setTranslationX/Y
                     // functions
                     float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
                     float dy = event.getY() - cv.getTop() - 10;
@@ -124,9 +131,6 @@ public class NanoPondActivity extends Activity {
         mGridView.setMode(NanoPondView.State.RUNNING);
     }
 }
-
-
-
 
 
 

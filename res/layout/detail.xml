@@ -6,13 +6,13 @@
     android:layout_width="wrap_content"
     android:background="#7AAA">
     <TextView
-        android:text="Report"
+        android:text="Detail"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#FFF" />
 
     <ListView
-        android:id="@+id/report_property_list"
+        android:id="@+id/detail_property_list"
         android:layout_width="225px"
         android:layout_height="wrap_content" />
 

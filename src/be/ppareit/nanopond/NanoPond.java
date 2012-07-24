@@ -49,8 +49,8 @@ public class NanoPond {
      * rate.
      */
     public static final int INFLOW_RATE_VARIATION = 8000;
-    public static final int POND_SIZE_X = 320;
-    public static final int POND_SIZE_Y = 240;
+    public static final int POND_SIZE_X = 160;
+    public static final int POND_SIZE_Y = 120;
     /*
      * Maximum genome size.
      */
@@ -83,7 +83,14 @@ public class NanoPond {
         }
     }
 
-    class Cell {
+    public class Cell {
+
+        long generation;
+        long ID;
+        long parentID;
+        long lineage;
+        int energy;
+        byte[] genome;
 
         public Cell() {
             this.ID = 0;
@@ -94,12 +101,6 @@ public class NanoPond {
             this.genome = new byte[POND_DEPTH];
             System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
         }
-        long generation;
-        long ID;
-        long parentID;
-        long lineage;
-        int energy;
-        byte[] genome;
 
         /** Fill genome of the cell with random instruction */
         public void setRandomGenome() {

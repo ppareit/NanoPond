@@ -61,6 +61,8 @@ public class NanoPondView extends GameLoopView {
 
     private final Paint mCellPaint = new Paint();
 
+    private final Paint mActiveCellPaint = new Paint();
+
     // Useful paint to display dubugging info on screen
     private final Paint mDebugPaint = new Paint();
 
@@ -70,6 +72,10 @@ public class NanoPondView extends GameLoopView {
 
     // keeps track when the user moves the display
     boolean mPanInProgress = false;
+
+    // keep track of the active cell
+    private int mActiveCellCol = -1;
+    private int mActiveCellRow = -1;
 
     public NanoPondView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -86,6 +92,8 @@ public class NanoPondView extends GameLoopView {
 
         mDebugPaint.setARGB(255, 255, 240, 0);
         mDebugPaint.setTextSize(32);
+
+        mActiveCellPaint.setColor(Color.CYAN);
 
         setTargetFps(0);
 
@@ -127,10 +135,26 @@ public class NanoPondView extends GameLoopView {
         }
     }
 
+    public boolean isCellActive() {
+        return (mActiveCellCol != -1);
+    }
+
+    public int getActiveCellCol() {
+        if (mActiveCellCol == -1)
+            throw new IllegalStateException("No cell active");
+        return mActiveCellCol;
+    }
+
+    public int getActiveCellRow() {
+        if (mActiveCellRow == -1)
+            throw new IllegalStateException("No cell active");
+        return mActiveCellRow;
+    }
+
     @Override
     protected void onUpdate() {
         // the nanopond object runs in its own thread
-        // thus that is updated continuesly
+        // thus that is updated continuously
 
         // try to remove the margins
         if (mPanInProgress == false) {
@@ -168,6 +192,9 @@ public class NanoPondView extends GameLoopView {
             mLastTouchX = event.getX();
             mLastTouchY = event.getY();
             mActivePointerId = event.getPointerId(0);
+            // set the active cell
+            mActiveCellCol = (int) ((mLastTouchX - mXOffset)/(mScaleX*mScaleFactor));
+            mActiveCellRow = (int) ((mLastTouchY - mYOffset)/(mScaleY*mScaleFactor));
             break;
         }
         case MotionEvent.ACTION_MOVE: {
@@ -224,7 +251,7 @@ public class NanoPondView extends GameLoopView {
 
         final int cols = NanoPond.POND_SIZE_X;
         final int rows = NanoPond.POND_SIZE_Y;
-        final int size = 1;
+        final float size = 1;
 
         canvas.drawRect(0, 0, getWidth(), getHeight(), mCanvasPaint);
 
@@ -235,17 +262,38 @@ public class NanoPondView extends GameLoopView {
 
         canvas.drawRect(0, 0, cols * size, rows * size, mBackgroundPaint);
 
+        // draw all the individual cells
         for (int c = 0; c < cols; c++) {
             for (int r = 0; r < rows; r++) {
                 final Cell cell = pond[c][r];
                 if (cell.generation > 2 && cell.energy > 0) {
-                    int left = (c * size);
-                    int top = (r * size);
-                    int right = (c * size + size);
-                    int bottom = (r * size + size);
-                    mCellPaint.setColor(getColor(pond[c][r]));
+                    float left = (c * size);
+                    float top = (r * size);
+                    float right = (c * size + size);
+                    float bottom = (r * size + size);
+                    mCellPaint.setColor(getColor(cell));
                     canvas.drawRect(left, top, right, bottom, mCellPaint);
                 }
+            }
+        }
+
+        // draw the active cell
+        if (mActiveCellCol != -1) {
+            float left = (mActiveCellCol * size);
+            float top = (mActiveCellRow * size);
+            float right = (mActiveCellCol * size + size);
+            float bottom = (mActiveCellRow * size + size);
+            canvas.drawRect(left, top, right, bottom, mActiveCellPaint);
+            left += size/8;
+            top += size/8;
+            right -= size/8;
+            bottom -= size/8;
+            final Cell cell = pond[mActiveCellCol][mActiveCellRow];
+            if (cell.generation > 2 && cell.energy > 0) {
+                mCellPaint.setColor(getColor(cell));
+                canvas.drawRect(left, top, right, bottom, mCellPaint);
+            } else {
+                canvas.drawRect(left,  top, right, bottom, mBackgroundPaint);
             }
         }
 
