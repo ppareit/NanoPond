@@ -74,8 +74,8 @@ public class NanoPondView extends GameLoopView {
     boolean mPanInProgress = false;
 
     // keep track of the active cell
-    private int mActiveCellCol = -1;
-    private int mActiveCellRow = -1;
+    private int mActiveCellCol = 0;
+    private int mActiveCellRow = 0;
 
     public NanoPondView(Context context, AttributeSet attrs) {
         super(context, attrs);
