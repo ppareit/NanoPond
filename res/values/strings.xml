@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NanoPond</string>
+
+    <string name="menu_edit_title">Edit</string>
+
+    <string name="hexa_label">Hexa</string>
+
+    <string name="no_cell_active_msg">
+        There is no cell active. Select a cell first.
+    </string>
 </resources>

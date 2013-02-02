@@ -1,18 +1,33 @@
 package be.ppareit.nanopond;
 
+import static be.ppareit.StringLib.isHexString;
 import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnLongClickListener;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import be.ppareit.nanopond.NanoPond.Cell;
+import be.ppareit.nanopond.R.id;
 
 public class NanoPondActivity extends Activity {
 
     private static final String TAG = NanoPondActivity.class.getSimpleName();
+
+    private static final int DIALOG_EDITCELL = 0x010;
 
     private NanoPond mNanopond = null;
 
@@ -49,13 +64,86 @@ public class NanoPondActivity extends Activity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_editcell:
+            showDialog(DIALOG_EDITCELL);
+            break;
+        }
+        return true;
+    }
+
+    @Override
+    public Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DIALOG_EDITCELL:
+            createEditCellDialog();
+            break;
+        }
+        return super.onCreateDialog(id);
+    }
+
     NanoPond getNanoPond() {
         return mNanopond;
     }
 
+    void createEditCellDialog() {
+        Log.d(TAG, "Creating the editcell dialog");
+        if (mGridView.isCellActive() == false) {
+            Toast.makeText(this, R.string.no_cell_active_msg, Toast.LENGTH_LONG).show();
+            return;
+        }
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.editcell);
+        dialog.setTitle(R.string.menu_edit_title);
+        final TextView hexaText = (TextView) dialog.findViewById(id.hexa_edit);
+        final Button okButton = (Button) dialog.findViewById(id.ok);
+        final int activeX = mGridView.getActiveCellCol();
+        final int activeY = mGridView.getActiveCellRow();
+        final Cell activeCell = mNanopond.pond[activeX][activeY];
+        hexaText.setText(activeCell.getHexa());
+        hexaText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > NanoPond.POND_DEPTH) {
+                    okButton.setEnabled(false);
+                } else if (isHexString(s.toString()) == false) {
+                    okButton.setEnabled(false);
+                } else {
+                    okButton.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        okButton.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                activeCell.setGenome(hexaText.getText().toString());
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
     /**
      * This makes the given existing childView floatable on top of the mainView.
-     *
+     * 
      * @param childView
      *            Child view to make floatable
      */
@@ -72,8 +160,7 @@ public class NanoPondActivity extends Activity {
                     @Override
                     public void onProvideShadowMetrics(Point shadowSize,
                             Point shadowTouchPoint) {
-                        super.onProvideShadowMetrics(shadowSize,
-                                shadowTouchPoint);
+                        super.onProvideShadowMetrics(shadowSize, shadowTouchPoint);
                         shadowTouchPoint.y = 10;
                     }
                 }, v, 0);
@@ -131,14 +218,3 @@ public class NanoPondActivity extends Activity {
         mGridView.setMode(NanoPondView.State.RUNNING);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

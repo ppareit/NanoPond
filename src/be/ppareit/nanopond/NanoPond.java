@@ -23,30 +23,31 @@
  */
 package be.ppareit.nanopond;
 
+import android.util.Log;
+
 public class NanoPond {
 
+    private static final String TAG = NanoPond.class.getSimpleName();
+
     /* All available instructions */
-    String[] names = {"ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
-            "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP"};
+    String[] names = { "ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
+            "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP" };
     /*
-     * Frequency of comprehensive reports-- lower values will provide more info
-     * while slowing down the simulation. Higher values will give less frequent
-     * updates. This is also the frequency of screen refreshes if SDL is
-     * enabled.
+     * Frequency of comprehensive reports-- lower values will provide more info while
+     * slowing down the simulation. Higher values will give less frequent updates. This is
+     * also the frequency of screen refreshes if SDL is enabled.
      */
     public static final int REPORT_FREQUENCY = 100000;
     /*
-     * How frequently should random cells / energy be introduced? Making this
-     * too high makes things very chaotic. Making it too low might not introduce
-     * enough energy.
+     * How frequently should random cells / energy be introduced? Making this too high
+     * makes things very chaotic. Making it too low might not introduce enough energy.
      */
     public static final int INFLOW_FREQUENCY = 100;
     /* Base amount of energy to introduce per INFLOW_FREQUENCY ticks */
     public static final int INFLOW_RATE_BASE = 4000;
     /*
-     * A random amount of energy between 0 and this is added to INFLOW_RATE_BASE
-     * when energy is introduced. Comment this out for no variation in inflow
-     * rate.
+     * A random amount of energy between 0 and this is added to INFLOW_RATE_BASE when
+     * energy is introduced. Comment this out for no variation in inflow rate.
      */
     public static final int INFLOW_RATE_VARIATION = 8000;
     public static final int POND_SIZE_X = 160;
@@ -56,9 +57,8 @@ public class NanoPond {
      */
     public static final int POND_DEPTH = 64;
     /*
-     * This is the divisor that determines how much energy is taken from cells
-     * when they try to KILL a viable cell neighbor and fail. Higher numbers
-     * mean lower penalties.
+     * This is the divisor that determines how much energy is taken from cells when they
+     * try to KILL a viable cell neighbor and fail. Higher numbers mean lower penalties.
      */
     public static final int FAILED_KILL_PENALTY = 2;
     byte[] startBuffer = new byte[POND_DEPTH];
@@ -108,7 +108,29 @@ public class NanoPond {
                 genome[i] = (byte) rg.nextInt(16);
             }
         }
+
+        public String getHexa() {
+            return hexa(genome);
+        }
+
+        public void setGenome(String hex) {
+            System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
+            for (int i = 0; i < hex.length(); ++i) {
+                char ch = hex.charAt(i);
+                if ('0' <= ch && ch <= '9') {
+                    genome[i] = (byte) (ch - '0');
+                } else if ('a' <= ch && ch <= 'f') {
+                    genome[i] = (byte) (ch - 'a' + 10);
+                } else if ('A' <= ch && ch <= 'F') {
+                    genome[i] = (byte) (ch - 'A' + 10);
+                } else {
+                    Log.e(TAG, "Failed to parse hex string for the genome");
+                    setRandomGenome();
+                }
+            }
+        }
     }
+
     /* The pond is a 2D array of cells */
     Cell[][] pond = new Cell[POND_SIZE_X][POND_SIZE_Y];
     private static MTRandom rg = new MTRandom();
@@ -125,7 +147,7 @@ public class NanoPond {
         long viableCellShares = 0;
 
         public void reset() {
-            //instructionExecutions = new long[16];
+            // instructionExecutions = new long[16];
             for (int i = 0; i < instructionExecutions.length; ++i) {
                 instructionExecutions[i] = 0;
             }
@@ -135,6 +157,7 @@ public class NanoPond {
             viableCellShares = 0;
         }
     }
+
     /* Global statistics counters */
     PerReportStatCounters statCounters = new PerReportStatCounters();
     boolean replicatorMessage = false;
@@ -149,6 +172,7 @@ public class NanoPond {
         long replaced;
         long shares;
     };
+
     static private Report report = new Report();
 
     public Report getReport() {
@@ -180,7 +204,8 @@ public class NanoPond {
         }
         if (maxGeneration <= 2 && replicatorMessage) {
             replicatorMessage = false;
-            System.out.println("[EVENT] Replicators have gone extinct in the year " + clock);
+            System.out.println("[EVENT] Replicators have gone extinct in the year "
+                    + clock);
         }
         report.energy = totalEnergy;
         report.maxGeneration = maxGeneration;
@@ -195,7 +220,7 @@ public class NanoPond {
 
     /**
      * Get a neighbor in the pond
-     *
+     * 
      * @param x
      *            Starting X position
      * @param y
@@ -219,12 +244,12 @@ public class NanoPond {
         }
 
     }
-    int[] BITS = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
+
+    int[] BITS = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
 
     /**
-     * Determines whether neighbor cell is accessible by the cell with the
-     * register value.
-     *
+     * Determines whether neighbor cell is accessible by the cell with the register value.
+     * 
      * @param reg
      *            register value of the attacking cell
      * @param positiveInteraction
@@ -287,7 +312,6 @@ public class NanoPond {
     /* Virtual machine loop/rep stack */
     private final int loopStackPointer[] = new int[POND_DEPTH];
 
-
     /* Main loop */
     public void singleStep() {
 
@@ -297,9 +321,9 @@ public class NanoPond {
         clock++;
 
         /*
-         * Introduce a random cell somewhere with a given energy level.
-         * This is called seeding and introduces both energy and entropy into
-         * the substrate. This happens every INFLOW_FREQUENCY clock ticks.
+         * Introduce a random cell somewhere with a given energy level. This is called
+         * seeding and introduces both energy and entropy into the substrate. This happens
+         * every INFLOW_FREQUENCY clock ticks.
          */
         if (clock % INFLOW_FREQUENCY == 0) {
             int x = rg.nextInt(POND_SIZE_X);
@@ -309,7 +333,8 @@ public class NanoPond {
             pond[x][y].parentID = 0;
             pond[x][y].lineage = cellIdCounter;
             pond[x][y].generation = 0;
-            pond[x][y].energy = INFLOW_RATE_BASE + (int) (rg.nextDouble() * INFLOW_RATE_VARIATION);
+            pond[x][y].energy = INFLOW_RATE_BASE
+                    + (int) (rg.nextDouble() * INFLOW_RATE_VARIATION);
 
             pond[x][y].setRandomGenome();
 
@@ -336,11 +361,10 @@ public class NanoPond {
         int instructionIndex = 0;// the current instruction index
         while (c.energy > 0 && !stop) {
             /*
-             * Randomly frob either the instruction or the register with a
-             * probability defined by MUTATION_RATE. This introduces
-             * variation, and since the variation is introduced into the
-             * state of the VM it can have all manner of different effects
-             * on the end result.
+             * Randomly frob either the instruction or the register with a probability
+             * defined by MUTATION_RATE. This introduces variation, and since the
+             * variation is introduced into the state of the VM it can have all manner of
+             * different effects on the end result.
              */
             // This is faulty execution by duplicating or skipping instructions
             if (rg.nextDouble() < MUTATION_RATE) {
@@ -350,18 +374,18 @@ public class NanoPond {
                 case 0:
                     c.genome[instructionIndex] = (byte) rg.nextInt(16);
                     break;
-                    /* change register */
+                /* change register */
                 case 1:
                     reg = (byte) rg.nextInt(16);
                     break;
-                    /* duplicate instruction execution */
+                /* duplicate instruction execution */
                 case 2:
                     if (instructionIndex == 0) {
                         instructionIndex = POND_DEPTH;
                     }
                     instructionIndex--;
                     break;
-                    /* skip instruction */
+                /* skip instruction */
                 case 3:
                     instructionIndex++;
                     instructionIndex %= POND_DEPTH;
@@ -379,10 +403,10 @@ public class NanoPond {
                 if (c.genome[instructionIndex] == 9) {
                     falseLoopDepth++;
                 } /*
-                 * Decrement on REP
-                 */ else if (c.genome[instructionIndex] == 10) {
-                     falseLoopDepth--;
-                 }
+                   * Decrement on REP
+                   */else if (c.genome[instructionIndex] == 10) {
+                    falseLoopDepth--;
+                }
             } else {
                 /*
                  * Keep track of execution frequencies for each instruction
@@ -426,10 +450,11 @@ public class NanoPond {
                 case 0x8: /* WRITEB: Write out from the register to buffer */
                     outputBuf[pointer] = reg;
                     break;
-                case 0x9: /* LOOP: Jump forward to matching REP if
-                 * register is zero */
+                case 0x9: /*
+                           * LOOP: Jump forward to matching REP if register is zero
+                           */
                     if (reg > 0) {
-                        if (loopStackPtr >= POND_DEPTH) /* Stack overflow ends execution */ {
+                        if (loopStackPtr >= POND_DEPTH) /* Stack overflow ends execution */{
                             stop = true;
                         } else {
                             loopStackPointer[loopStackPtr] = instructionIndex;
@@ -440,26 +465,29 @@ public class NanoPond {
                     }
 
                     break;
-                case 0xa: /* REP: Jump back to matching LOOP if register
-                 * is nonzero */
+                case 0xa: /*
+                           * REP: Jump back to matching LOOP if register is nonzero
+                           */
                     if (loopStackPtr > 0) {
                         loopStackPtr--;
                         if (reg > 0) {
                             instructionIndex = loopStackPointer[loopStackPtr];
                             /*
-                             * This ensures that the LOOP is rerun and that
-                             * the instruction pointer has not yet changed.
+                             * This ensures that the LOOP is rerun and that the
+                             * instruction pointer has not yet changed.
                              */
                             continue;
                         }
                     }
                     break;
-                case 0xb: /* TURN: Turn in the direction specified by
-                 * register */
+                case 0xb: /*
+                           * TURN: Turn in the direction specified by register
+                           */
                     facing = Direction.getDirection(Math.abs(reg) % 4);
                     break;
-                case 0xc: /* XCHG: Skip next instruction and exchange
-                 * value of reg with it */
+                case 0xc: /*
+                           * XCHG: Skip next instruction and exchange value of reg with it
+                           */
                     instructionIndex++;
                     instructionIndex %= POND_DEPTH;
                     byte tmp = reg;
@@ -467,15 +495,19 @@ public class NanoPond {
                     c.genome[instructionIndex] = tmp;
 
                     break;
-                case 0xd: /* KILL: Blow away neighboring cell if allowed
-                 * with penalty on failure */
+                case 0xd: /*
+                           * KILL: Blow away neighboring cell if allowed with penalty on
+                           * failure
+                           */
                     Cell neighborKill = getNeighbor(x, y, facing);
                     if (accessAllowed(neighborKill, reg, false)) {
                         if (neighborKill.generation > 2) {
                             statCounters.viableCellsKilled++;
                         }
-                        /* putting a STOP instruction as first instruction
-                         * will kill the neighboring cell */
+                        /*
+                         * putting a STOP instruction as first instruction will kill the
+                         * neighboring cell
+                         */
                         neighborKill.genome[0] = 15;
                         neighborKill.ID = cellIdCounter;
                         neighborKill.parentID = 0;
@@ -488,8 +520,9 @@ public class NanoPond {
                         c.energy /= FAILED_KILL_PENALTY;
                     }
                     break;
-                case 0xe: /* SHARE: Equalize energy between self and
-                 * neighbor if allowed */
+                case 0xe: /*
+                           * SHARE: Equalize energy between self and neighbor if allowed
+                           */
                     Cell neighborShare = getNeighbor(x, y, facing);
                     if (accessAllowed(neighborShare, reg, true)) {
                         if (neighborShare.generation > 2) {
@@ -507,18 +540,16 @@ public class NanoPond {
             }
 
             /*
-             * Increase instruction pointer and loop at the end of the
-             * genome
+             * Increase instruction pointer and loop at the end of the genome
              */
             instructionIndex++;
             instructionIndex %= POND_DEPTH;
         }
         /*
-         * Copy outputBuf into neighbor if access is permitted and there is
-         * energy there to make something happen. There is no need to copy
-         * to a cell with no energy, since anything copied there would never
-         * be executed and then would be replaced with random junk
-         * eventually. See the seeding code in the main loop above.
+         * Copy outputBuf into neighbor if access is permitted and there is energy there
+         * to make something happen. There is no need to copy to a cell with no energy,
+         * since anything copied there would never be executed and then would be replaced
+         * with random junk eventually. See the seeding code in the main loop above.
          */
         if (outputBuf[0] != 15) {
             Cell neighbor = getNeighbor(x, y, facing);
@@ -537,7 +568,7 @@ public class NanoPond {
                 // This is a 'faulty' copy mechanism that allows minor
                 // mutations to enter when copying the cell
                 // alternative non faulty:
-                //   System.arraycopy(outputBuf, 0, neighbor.genome, 0, POND_DEPTH);
+                // System.arraycopy(outputBuf, 0, neighbor.genome, 0, POND_DEPTH);
                 int i = 0, j = 0;
                 while (i < POND_DEPTH && j < POND_DEPTH) {
                     if (rg.nextDouble() < MUTATION_RATE) {
@@ -548,13 +579,13 @@ public class NanoPond {
                             neighbor.genome[i++] = (byte) rg.nextInt(16);
                             j++;
                             break;
-                            /* duplicate instruction execution */
+                        /* duplicate instruction execution */
                         case 1:
                             neighbor.genome[i++] = outputBuf[j];
                             i %= POND_DEPTH;
                             neighbor.genome[i++] = outputBuf[j++];
                             break;
-                            /* skip instruction */
+                        /* skip instruction */
                         case 2:
                             i++;
                             j++;
