@@ -1,2 +1,4 @@
-bin/*
-gen/*
+Lib/bin/*
+Lib/gen/*
+Lib/.settings/*
+
