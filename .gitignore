@@ -1,4 +1,7 @@
 Lib/bin/*
 Lib/gen/*
 Lib/.settings/*
+Demo/bin/*
+Demo/gen/*
+Demo/.settings/*
 
