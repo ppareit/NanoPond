@@ -1,7 +1,7 @@
-Lib/bin/*
-Lib/gen/*
-Lib/.settings/*
-Demo/bin/*
-Demo/gen/*
-Demo/.settings/*
-
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
