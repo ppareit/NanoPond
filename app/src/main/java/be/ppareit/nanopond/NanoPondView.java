@@ -21,10 +21,17 @@ package be.ppareit.nanopond;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.WindowManager;
+
+import net.vrallev.android.cat.Cat;
+
 import be.ppareit.android.GameLoopView;
 import be.ppareit.nanopond.NanoPond.Cell;
 
@@ -32,8 +39,6 @@ import be.ppareit.nanopond.NanoPond.Cell;
  *
  */
 public class NanoPondView extends GameLoopView {
-
-    static final String TAG = "NanoPondView";
 
     public enum State {
         RUNNING, PAUSED,
@@ -45,33 +50,16 @@ public class NanoPondView extends GameLoopView {
 
     private Paint mCanvasPaint = null;
     private Paint mBackgroundPaint = null;
-
-    private static final int INVALID_POINTER_ID = -1;
-
-    private int mActivePointerId = INVALID_POINTER_ID;
-    private float mLastTouchX;
-    private float mLastTouchY;
-
-    private int mXOffset = 0;
-    private int mYOffset = 0;
-
-    // Scale calculated to fill screen initially
-    private float mScaleX = 1.0f;
-    private float mScaleY = 1.0f;
-
     private final Paint mCellPaint = new Paint();
-
     private final Paint mActiveCellPaint = new Paint();
 
-    // Useful paint to display dubugging info on screen
+    // Useful paint to display debugging info on screen
     private final Paint mDebugPaint = new Paint();
 
-    // Scale by user
-    private ScaleGestureDetector mScaleGestureDetector;
-    private float mScaleFactor = 1.0f;
+    private GestureDetector mMoveDetector;
+    private ScaleGestureDetector mScaleDetector;
 
-    // keeps track when the user moves the display
-    boolean mPanInProgress = false;
+    private Matrix mDrawMatrix = new Matrix();
 
     // keep track of the active cell
     private int mActiveCellCol = 0;
@@ -97,32 +85,8 @@ public class NanoPondView extends GameLoopView {
 
         setTargetFps(0);
 
-        mScaleGestureDetector = new ScaleGestureDetector(context,
-                new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                    @Override
-                    public boolean onScale(ScaleGestureDetector detector) {
-                        final float oldScaleFactor = mScaleFactor;
-                        mScaleFactor *= detector.getScaleFactor();
-                        // limit the scaling
-                        mScaleFactor = Math.max(0.5f, mScaleFactor);
-                        mScaleFactor = Math.min(20.0f, mScaleFactor);
-                        // reposition
-                        // TODO: further improve centerposition
-                        final int cols = NanoPond.POND_SIZE_X;
-                        final int rows = NanoPond.POND_SIZE_Y;
-                        final float focusX = detector.getFocusX();
-                        final float focusY = detector.getFocusY();
-                        final float width = getWidth();
-                        final float height = getHeight();
-                        mXOffset += mScaleX * cols
-                                * (oldScaleFactor - mScaleFactor)
-                                / (width / focusX);
-                        mYOffset += mScaleY * rows
-                                * (oldScaleFactor - mScaleFactor)
-                                / (height / focusY);
-                        return true;
-                    }
-                });
+        mMoveDetector = new GestureDetector(context, new MoveListener());
+        mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     public void setMode(State mode) {
@@ -153,92 +117,64 @@ public class NanoPondView extends GameLoopView {
 
     @Override
     protected void onUpdate() {
-        // the nanopond object runs in its own thread
-        // thus that is updated continuously
+        // the nanopond object runs in its own thread thus that is updated continuously
+    }
 
-        // try to remove the margins
-        if (mPanInProgress == false) {
-            if (mXOffset > 0) {
-                mXOffset -= mXOffset / 2;
-            }
-            final int cols = NanoPond.POND_SIZE_X;
-            final float rightMargin = getWidth() - mXOffset - cols
-                    * mScaleFactor * mScaleX;
-            if (rightMargin > 0) {
-                mXOffset += rightMargin / 2;
-            }
-            if (mYOffset > 0) {
-                mYOffset -= mYOffset / 2;
-            }
-            final int rows = NanoPond.POND_SIZE_Y;
-            final float bottomMargin = getHeight() - mYOffset - rows
-                    * mScaleFactor * mScaleY;
-            if (bottomMargin > 0) {
-                mYOffset += bottomMargin / 2;
-            }
+    private class MoveListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            mDrawMatrix.postTranslate(-distanceX, -distanceY);
+            return true;
         }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            float[] pts = { e.getX(), e.getY() };
+            Matrix inverse = new Matrix();
+            mDrawMatrix.invert(inverse);
+            inverse.mapPoints(pts);
+            final int c = (int) pts[0];
+            final int r = (int) pts[1];
+            Cat.d("Tapped: " + c + "  " + r);
+
+            if (0 <= c && c < NanoPond.POND_SIZE_X && 0 <= r && r < NanoPond.POND_SIZE_Y) {
+                mActiveCellCol = c;
+                mActiveCellRow = r;
+            }
+            return true;
+        }
+    }
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            float factor = detector.getScaleFactor();
+
+            // limit zooming
+            final float scale = factor * getScale();
+            if (scale < 1.f || 20.f < scale) {
+                return false;
+            }
+
+            final float focusX = detector.getFocusX();
+            final float focusY = detector.getFocusY();
+            mDrawMatrix.postScale(factor, factor, focusX, focusY);
+
+            Cat.d("New scale: " + getScale());
+            return true;
+        }
+    }
+
+    private float getScale() {
+        return mDrawMatrix.mapRadius(1.f);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mScaleGestureDetector.onTouchEvent(event);
-
-        final int action = event.getAction();
-        switch (action & MotionEvent.ACTION_MASK) {
-        case MotionEvent.ACTION_DOWN: {
-            // started moving the display
-            mPanInProgress = true;
-            // store touch data
-            mLastTouchX = event.getX();
-            mLastTouchY = event.getY();
-            mActivePointerId = event.getPointerId(0);
-            // set the active cell
-            mActiveCellCol = (int) ((mLastTouchX - mXOffset)/(mScaleX*mScaleFactor));
-            mActiveCellRow = (int) ((mLastTouchY - mYOffset)/(mScaleY*mScaleFactor));
-            break;
-        }
-        case MotionEvent.ACTION_MOVE: {
-            final int pointerIndex = event.findPointerIndex(mActivePointerId);
-            final float x = event.getX(pointerIndex);
-            final float y = event.getY(pointerIndex);
-
-            if (!mScaleGestureDetector.isInProgress()) {
-                final float dx = x - mLastTouchX;
-                final float dy = y - mLastTouchY;
-
-                mXOffset += dx;
-                mYOffset += dy;
-            }
-
-            mLastTouchX = x;
-            mLastTouchY = y;
-
-            break;
-        }
-        case MotionEvent.ACTION_UP: {
-            mActivePointerId = INVALID_POINTER_ID;
-            mPanInProgress = false;
-            break;
-        }
-        case MotionEvent.ACTION_CANCEL: {
-            mActivePointerId = INVALID_POINTER_ID;
-            mPanInProgress = false;
-            break;
-        }
-        case MotionEvent.ACTION_POINTER_UP: {
-            final int pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-            final int pointerId = event.getPointerId(pointerIndex);
-            if (pointerId == mActivePointerId) {
-                final int newPointerIndex = (pointerIndex == 0 ? 1 : 0);
-                mLastTouchX = event.getX(newPointerIndex);
-                mLastTouchY = event.getY(newPointerIndex);
-                mActivePointerId = event.getPointerId(newPointerIndex);
-            }
-            break;
-        }
-
-        }
-
+        mScaleDetector.onTouchEvent(event);
+        mMoveDetector.onTouchEvent(event);
+        invalidate();
         return true;
     }
 
@@ -256,9 +192,7 @@ public class NanoPondView extends GameLoopView {
         canvas.drawRect(0, 0, getWidth(), getHeight(), mCanvasPaint);
 
         canvas.save();
-        canvas.translate(mXOffset, mYOffset);
-        canvas.scale(mScaleX, mScaleY);
-        canvas.scale(mScaleFactor, mScaleFactor);
+        canvas.concat(mDrawMatrix);
 
         canvas.drawRect(0, 0, cols * size, rows * size, mBackgroundPaint);
 
@@ -304,8 +238,22 @@ public class NanoPondView extends GameLoopView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (isInEditMode())
             return;
-        mScaleX = (float) w / NanoPond.POND_SIZE_X;
-        mScaleY = (float) h / NanoPond.POND_SIZE_Y;
+
+        Cat.d("size changed");
+
+        mDrawMatrix.postTranslate(-NanoPond.POND_SIZE_X / 2, -NanoPond.POND_SIZE_Y / 2);
+
+        // scale to display metrics
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(metrics);
+
+        final float scale = 4 * metrics.density;
+        mDrawMatrix.postScale(scale, scale);
+        Cat.d("Size changed, new scale: " + scale);
+
+        // move left-top position to middle of screen
+        mDrawMatrix.postTranslate(getWidth() / 2, getHeight() / 2);
     }
 
     static int[] artificial = { Color.WHITE, Color.GREEN, Color.CYAN,
