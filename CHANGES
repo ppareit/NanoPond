@@ -1,0 +1,5 @@
+Version 1.1 (02/01/2016)
+* Use matrices to handle panning and scaling
+* fix resizing when keyboard is displayed
+* bug fixes
+
