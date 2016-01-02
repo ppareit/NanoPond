@@ -84,6 +84,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
                         onDraw(canvas);
                         drawFps(canvas);
                     }
+                } catch (Exception ignore) {
                 } finally {
                         mSurfaceHolder.unlockCanvasAndPost(canvas);
                 }
