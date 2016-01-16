@@ -22,24 +22,16 @@ public class ReportListAdapter extends BaseAdapter {
         nanopond = np;
         report = nanopond.getReport();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    while (true) {
-                        report = nanopond.getReport();
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                notifyDataSetChanged();
-                            }
-                        });
-                        Thread.sleep(100);
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                while (true) {
+                    report = nanopond.getReport();
+                    activity.runOnUiThread(() -> notifyDataSetChanged());
+                    Thread.sleep(100);
                 }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }
