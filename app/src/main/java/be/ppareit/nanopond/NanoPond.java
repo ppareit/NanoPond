@@ -289,13 +289,18 @@ public class NanoPond {
         Thread thread = new Thread() {
             @Override
             public void run() {
+                int threadCounter = 0;
                 while (true) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    // every 1000 steps we give the system some extra breathing time
+                    if (threadCounter % 1000 == 0) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     singleStep();
+                    ++threadCounter;
                 }
             }
         };
