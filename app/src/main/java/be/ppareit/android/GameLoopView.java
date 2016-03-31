@@ -4,17 +4,17 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Pieter Pareit - initial API and implementation
+ * Pieter Pareit - initial API and implementation
  ******************************************************************************/
 package be.ppareit.android;
 
@@ -26,6 +26,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import net.vrallev.android.cat.Cat;
 
 
 /**
@@ -71,7 +73,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
             Log.d(TAG, "AnimationThread.run'ing");
 
             // block until the surface is completely created in the main thread
-            while (! surfaceCreatedCompleted) {
+            while (!surfaceCreatedCompleted) {
             }
 
             // run the gameloop
@@ -86,7 +88,11 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
                     }
                 } catch (Exception ignore) {
                 } finally {
+                    try {
                         mSurfaceHolder.unlockCanvasAndPost(canvas);
+                    } catch (Exception e) {
+                        Cat.e(e.getMessage());
+                    }
                 }
                 sleepIfNeeded();
                 updateFps();
@@ -122,12 +128,12 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
         private void updateFps() {
             long currentTime = System.currentTimeMillis();
 
-            int timeDifference = (int)(currentTime - mLastTime);
+            int timeDifference = (int) (currentTime - mLastTime);
             mFrameSampleTime += timeDifference;
             mFrameSamplesCollected++;
 
             if (mFrameSamplesCollected == 10) {
-                mFps = ((10*1000) / mFrameSampleTime);
+                mFps = ((10 * 1000) / mFrameSampleTime);
 
                 mFrameSampleTime = 0;
                 mFrameSamplesCollected = 0;
@@ -139,7 +145,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
         private void drawFps(Canvas canvas) {
             if (mDrawFps && mFps != 0) {
                 int x = getWidth() - getWidth() / 8;
-                int y = getHeight() - (int)mFpsTextPaint.getTextSize() - 5;
+                int y = getHeight() - (int) mFpsTextPaint.getTextSize() - 5;
                 canvas.drawText(mFps + " fps", x, y, mFpsTextPaint);
             }
         }
@@ -211,7 +217,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
      * @param show Flag indicating wheter to show the fps or not.
      */
     public void setDrawFps(boolean show) {
-        mDrawFps  = show;
+        mDrawFps = show;
     }
 
     @Override
@@ -238,7 +244,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
             holder.unlockCanvasAndPost(canvas);
         }
         surfaceCreatedCompleted = true;
-        Log.d(TAG,"surfaceCreated'ed");
+        Log.d(TAG, "surfaceCreated'ed");
     }
 
     @Override
