@@ -1,6 +1,5 @@
 package be.ppareit.nanopond;
 
-import static be.ppareit.StringLib.isHexString;
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Point;
@@ -13,15 +12,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnDragListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import be.ppareit.nanopond.NanoPond.Cell;
 import be.ppareit.nanopond.R.id;
+
+import static be.ppareit.StringLib.isHexString;
 
 public class NanoPondActivity extends Activity {
 
@@ -95,7 +95,7 @@ public class NanoPondActivity extends Activity {
 
     void createEditCellDialog() {
         Log.d(TAG, "Creating the editcell dialog");
-        if (mGridView.isCellActive() == false) {
+        if (!mGridView.isCellActive()) {
             Toast.makeText(this, R.string.no_cell_active_msg, Toast.LENGTH_LONG).show();
             return;
         }
@@ -113,7 +113,7 @@ public class NanoPondActivity extends Activity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > NanoPond.POND_DEPTH) {
                     okButton.setEnabled(false);
-                } else if (isHexString(s.toString()) == false) {
+                } else if (!isHexString(s.toString())) {
                     okButton.setEnabled(false);
                 } else {
                     okButton.setEnabled(true);
@@ -128,13 +128,9 @@ public class NanoPondActivity extends Activity {
             public void afterTextChanged(Editable s) {
             }
         });
-        okButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                activeCell.setGenome(hexaText.getText().toString());
-                dialog.dismiss();
-            }
+        okButton.setOnClickListener(v -> {
+            activeCell.setGenome(hexaText.getText().toString());
+            dialog.dismiss();
         });
         dialog.show();
     }
@@ -166,40 +162,37 @@ public class NanoPondActivity extends Activity {
             }
         });
         // the main view repositions the child views
-        mMainView.setOnDragListener(new OnDragListener() {
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED: {
-                    Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
-                    // need to return true to keep getting drag/drop related
-                    // messages
-                    return true;
-                }
-                case DragEvent.ACTION_DRAG_ENDED: {
-                    Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
-                    // the child view is put in the localstate
-                    View cv = (View) event.getLocalState();
-                    // make visible again at the new position
-                    cv.setVisibility(View.VISIBLE);
-                    return true;
-                }
-                case DragEvent.ACTION_DROP: {
-                    Log.v(TAG, "onDrag : ACTION_DROP");
-                    // the child view is put in the localstate
-                    View cv = (View) event.getLocalState();
-                    // calling setLeft/setTop only works if layout is not yet
-                    // set at 'runtime', we need to use the setTranslationX/Y
-                    // functions
-                    float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
-                    float dy = event.getY() - cv.getTop() - 10;
-                    cv.setTranslationX(dx);
-                    cv.setTranslationY(dy);
-                    return true;
-                }
-                default:
-                    return false;
-                }
+        mMainView.setOnDragListener((v, event) -> {
+            switch (event.getAction()) {
+            case DragEvent.ACTION_DRAG_STARTED: {
+                Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
+                // need to return true to keep getting drag/drop related
+                // messages
+                return true;
+            }
+            case DragEvent.ACTION_DRAG_ENDED: {
+                Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
+                // the child view is put in the localstate
+                View cv = (View) event.getLocalState();
+                // make visible again at the new position
+                cv.setVisibility(View.VISIBLE);
+                return true;
+            }
+            case DragEvent.ACTION_DROP: {
+                Log.v(TAG, "onDrag : ACTION_DROP");
+                // the child view is put in the localstate
+                View cv = (View) event.getLocalState();
+                // calling setLeft/setTop only works if layout is not yet
+                // set at 'runtime', we need to use the setTranslationX/Y
+                // functions
+                float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
+                float dy = event.getY() - cv.getTop() - 10;
+                cv.setTranslationX(dx);
+                cv.setTranslationY(dy);
+                return true;
+            }
+            default:
+                return false;
             }
         });
     }

@@ -13,7 +13,7 @@
 
     <ListView
         android:id="@+id/detail_property_list"
-        android:layout_width="225px"
+        android:layout_width="225dp"
         android:layout_height="wrap_content" />
 
 </LinearLayout>

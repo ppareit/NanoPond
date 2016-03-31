@@ -26,30 +26,24 @@ public class DetailListAdapter extends BaseAdapter {
         mNanopond = np;
         mView = view;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    while (true) {
-                        mActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mView.isCellActive()) {
-                                    mActiveX = mView.getActiveCellCol();
-                                    mActiveY = mView.getActiveCellRow();
-                                    mActiveCell = mNanopond.pond[mActiveX][mActiveY];
-                                } else {
-                                    mActiveCell = null;
-                                }
-                                notifyDataSetChanged();
-                            }
-                        });
-                        Thread.sleep(100);
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                while (true) {
+                    mActivity.runOnUiThread(() -> {
+                        if (mView.isCellActive()) {
+                            mActiveX = mView.getActiveCellCol();
+                            mActiveY = mView.getActiveCellRow();
+                            mActiveCell = mNanopond.pond[mActiveX][mActiveY];
+                        } else {
+                            mActiveCell = null;
+                        }
+                        notifyDataSetChanged();
+                    });
+                    Thread.sleep(100);
                 }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }
@@ -109,9 +103,10 @@ public class DetailListAdapter extends BaseAdapter {
     }
 
     static private String hexa(byte[] genome) {
-        StringBuffer out=new StringBuffer();
-        for(int i=0;i<genome.length;i++)
-            out.append(Integer.toHexString(genome[i]));
+        StringBuilder out=new StringBuilder();
+        for (byte aGenome : genome) {
+            out.append(Integer.toHexString(aGenome));
+        }
         return out.substring(0,out.indexOf("ff")+1);
     }
 

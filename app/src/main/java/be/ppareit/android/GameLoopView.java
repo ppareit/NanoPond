@@ -137,7 +137,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
         }
 
         private void drawFps(Canvas canvas) {
-            if (mDrawFps ==true && mFps != 0) {
+            if (mDrawFps && mFps != 0) {
                 int x = getWidth() - getWidth() / 8;
                 int y = getHeight() - (int)mFpsTextPaint.getTextSize() - 5;
                 canvas.drawText(mFps + " fps", x, y, mFpsTextPaint);

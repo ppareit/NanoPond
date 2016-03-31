@@ -30,8 +30,8 @@ public class NanoPond {
     private static final String TAG = NanoPond.class.getSimpleName();
 
     /* All available instructions */
-    String[] names = { "ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
-            "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP" };
+    String[] names = {"ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
+            "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP"};
     /*
      * Frequency of comprehensive reports-- lower values will provide more info while
      * slowing down the simulation. Higher values will give less frequent updates. This is
@@ -69,16 +69,16 @@ public class NanoPond {
 
         public static Direction getDirection(int i) {
             switch (i) {
-            case 0:
-                return LEFT;
-            case 1:
-                return RIGHT;
-            case 2:
-                return UP;
-            case 3:
-                return DOWN;
-            default:
-                throw new RuntimeException("Unknown direction requested: " + i);
+                case 0:
+                    return LEFT;
+                case 1:
+                    return RIGHT;
+                case 2:
+                    return UP;
+                case 3:
+                    return DOWN;
+                default:
+                    throw new RuntimeException("Unknown direction requested: " + i);
             }
         }
     }
@@ -102,7 +102,9 @@ public class NanoPond {
             System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
         }
 
-        /** Fill genome of the cell with random instruction */
+        /**
+         * Fill genome of the cell with random instruction
+         */
         public void setRandomGenome() {
             for (int i = 0; i < POND_DEPTH; i++) {
                 genome[i] = (byte) rg.nextInt(16);
@@ -171,7 +173,7 @@ public class NanoPond {
         long kills;
         long replaced;
         long shares;
-    };
+    }
 
     static private Report report = new Report();
 
@@ -220,42 +222,36 @@ public class NanoPond {
 
     /**
      * Get a neighbor in the pond
-     * 
-     * @param x
-     *            Starting X position
-     * @param y
-     *            Starting Y position
-     * @param dir
-     *            Direction to get neighbor from
+     *
+     * @param x   Starting X position
+     * @param y   Starting Y position
+     * @param dir Direction to get neighbor from
      * @return neighboring cell
      */
     public Cell getNeighbor(int x, int y, Direction dir) {
         switch (dir) {
-        case LEFT:
-            return x != 0 ? pond[x - 1][y] : pond[POND_SIZE_X - 1][y];
-        case RIGHT:
-            return (x < (POND_SIZE_X - 1)) ? pond[x + 1][y] : pond[0][y];
-        case UP:
-            return y != 0 ? pond[x][y - 1] : pond[x][POND_SIZE_Y - 1];
-        case DOWN:
-            return (y < (POND_SIZE_Y - 1)) ? pond[x][y + 1] : pond[x][0];
-        default:
-            throw new RuntimeException("Unknown direction!");
+            case LEFT:
+                return x != 0 ? pond[x - 1][y] : pond[POND_SIZE_X - 1][y];
+            case RIGHT:
+                return (x < (POND_SIZE_X - 1)) ? pond[x + 1][y] : pond[0][y];
+            case UP:
+                return y != 0 ? pond[x][y - 1] : pond[x][POND_SIZE_Y - 1];
+            case DOWN:
+                return (y < (POND_SIZE_Y - 1)) ? pond[x][y + 1] : pond[x][0];
+            default:
+                throw new RuntimeException("Unknown direction!");
         }
 
     }
 
-    int[] BITS = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
+    int[] BITS = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
 
     /**
      * Determines whether neighbor cell is accessible by the cell with the register value.
-     * 
-     * @param reg
-     *            register value of the attacking cell
-     * @param positiveInteraction
-     *            kill & replace : false / share : true
-     * @param neighbor
-     *            the neighboring cell
+     *
+     * @param reg                 register value of the attacking cell
+     * @param positiveInteraction kill & replace : false / share : true
+     * @param neighbor            the neighboring cell
      * @return true if access to the neighbor is allowed, false in other cases
      */
     private boolean accessAllowed(Cell neighbor, byte reg, boolean positiveInteraction) {
@@ -286,25 +282,21 @@ public class NanoPond {
 
     public void run() {
 
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                int threadCounter = 0;
-                while (true) {
-                    // every 1000 steps we give the system some extra breathing time
-                    if (threadCounter % 1000 == 0) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+        new Thread(() -> {
+            int threadCounter = 0;
+            while (true) {
+                // every 1000 steps we give the system some extra breathing time
+                if (threadCounter % 1000 == 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    singleStep();
-                    ++threadCounter;
                 }
+                singleStep();
+                ++threadCounter;
             }
-        };
-        thread.start();
+        }).start();
 
     }
 
@@ -381,25 +373,25 @@ public class NanoPond {
                 int type = rg.nextInt(4);
                 switch (type) {
                 /* replacement */
-                case 0:
-                    c.genome[instructionIndex] = (byte) rg.nextInt(16);
-                    break;
+                    case 0:
+                        c.genome[instructionIndex] = (byte) rg.nextInt(16);
+                        break;
                 /* change register */
-                case 1:
-                    reg = (byte) rg.nextInt(16);
-                    break;
+                    case 1:
+                        reg = (byte) rg.nextInt(16);
+                        break;
                 /* duplicate instruction execution */
-                case 2:
-                    if (instructionIndex == 0) {
-                        instructionIndex = POND_DEPTH;
-                    }
-                    instructionIndex--;
-                    break;
+                    case 2:
+                        if (instructionIndex == 0) {
+                            instructionIndex = POND_DEPTH;
+                        }
+                        instructionIndex--;
+                        break;
                 /* skip instruction */
-                case 3:
-                    instructionIndex++;
-                    instructionIndex %= POND_DEPTH;
-                    break;
+                    case 3:
+                        instructionIndex++;
+                        instructionIndex %= POND_DEPTH;
+                        break;
                 }
             }
 
@@ -414,7 +406,7 @@ public class NanoPond {
                     falseLoopDepth++;
                 } /*
                    * Decrement on REP
-                   */else if (c.genome[instructionIndex] == 10) {
+                   */ else if (c.genome[instructionIndex] == 10) {
                     falseLoopDepth--;
                 }
             } else {
@@ -424,128 +416,128 @@ public class NanoPond {
                 statCounters.instructionExecutions[c.genome[instructionIndex]]++;
 
                 switch (c.genome[instructionIndex]) {
-                case 0x0: /* ZERO: Zero VM state registers */
-                    reg = 0;
-                    pointer = 0;
-                    break;
-                case 0x1: /* FWD: Increment the pointer (wrap at end) */
-                    pointer++;
-                    pointer %= POND_DEPTH;
-                    break;
-                case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
-                    if (pointer == 0) {
-                        pointer = POND_DEPTH;
-                    }
-                    pointer--;
-                    break;
-                case 0x3: /* INC: Increment the register */
-                    reg++;
-                    reg %= 16;
-                    break;
-                case 0x4: /* DEC: Decrement the register */
-                    if (reg == 0) {
-                        reg = 16;
-                    }
-                    reg--;
-                    break;
-                case 0x5: /* READG: Read into the register from genome */
-                    reg = c.genome[pointer];
-                    break;
-                case 0x6: /* WRITEG: Write out from the register to genome */
-                    c.genome[pointer] = reg;
-                    break;
-                case 0x7: /* READB: Read into the register from buffer */
-                    reg = outputBuf[pointer];
-                    break;
-                case 0x8: /* WRITEB: Write out from the register to buffer */
-                    outputBuf[pointer] = reg;
-                    break;
-                case 0x9: /*
+                    case 0x0: /* ZERO: Zero VM state registers */
+                        reg = 0;
+                        pointer = 0;
+                        break;
+                    case 0x1: /* FWD: Increment the pointer (wrap at end) */
+                        pointer++;
+                        pointer %= POND_DEPTH;
+                        break;
+                    case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
+                        if (pointer == 0) {
+                            pointer = POND_DEPTH;
+                        }
+                        pointer--;
+                        break;
+                    case 0x3: /* INC: Increment the register */
+                        reg++;
+                        reg %= 16;
+                        break;
+                    case 0x4: /* DEC: Decrement the register */
+                        if (reg == 0) {
+                            reg = 16;
+                        }
+                        reg--;
+                        break;
+                    case 0x5: /* READG: Read into the register from genome */
+                        reg = c.genome[pointer];
+                        break;
+                    case 0x6: /* WRITEG: Write out from the register to genome */
+                        c.genome[pointer] = reg;
+                        break;
+                    case 0x7: /* READB: Read into the register from buffer */
+                        reg = outputBuf[pointer];
+                        break;
+                    case 0x8: /* WRITEB: Write out from the register to buffer */
+                        outputBuf[pointer] = reg;
+                        break;
+                    case 0x9: /*
                            * LOOP: Jump forward to matching REP if register is zero
                            */
-                    if (reg > 0) {
-                        if (loopStackPtr >= POND_DEPTH) /* Stack overflow ends execution */{
-                            stop = true;
+                        if (reg > 0) {
+                            if (loopStackPtr >= POND_DEPTH) /* Stack overflow ends execution */ {
+                                stop = true;
+                            } else {
+                                loopStackPointer[loopStackPtr] = instructionIndex;
+                                loopStackPtr++;
+                            }
                         } else {
-                            loopStackPointer[loopStackPtr] = instructionIndex;
-                            loopStackPtr++;
+                            falseLoopDepth = 1;
                         }
-                    } else {
-                        falseLoopDepth = 1;
-                    }
 
-                    break;
-                case 0xa: /*
+                        break;
+                    case 0xa: /*
                            * REP: Jump back to matching LOOP if register is nonzero
                            */
-                    if (loopStackPtr > 0) {
-                        loopStackPtr--;
-                        if (reg > 0) {
-                            instructionIndex = loopStackPointer[loopStackPtr];
+                        if (loopStackPtr > 0) {
+                            loopStackPtr--;
+                            if (reg > 0) {
+                                instructionIndex = loopStackPointer[loopStackPtr];
                             /*
                              * This ensures that the LOOP is rerun and that the
                              * instruction pointer has not yet changed.
                              */
-                            continue;
+                                continue;
+                            }
                         }
-                    }
-                    break;
-                case 0xb: /*
+                        break;
+                    case 0xb: /*
                            * TURN: Turn in the direction specified by register
                            */
-                    facing = Direction.getDirection(Math.abs(reg) % 4);
-                    break;
-                case 0xc: /*
+                        facing = Direction.getDirection(Math.abs(reg) % 4);
+                        break;
+                    case 0xc: /*
                            * XCHG: Skip next instruction and exchange value of reg with it
                            */
-                    instructionIndex++;
-                    instructionIndex %= POND_DEPTH;
-                    byte tmp = reg;
-                    reg = c.genome[instructionIndex];
-                    c.genome[instructionIndex] = tmp;
+                        instructionIndex++;
+                        instructionIndex %= POND_DEPTH;
+                        byte tmp = reg;
+                        reg = c.genome[instructionIndex];
+                        c.genome[instructionIndex] = tmp;
 
-                    break;
-                case 0xd: /*
+                        break;
+                    case 0xd: /*
                            * KILL: Blow away neighboring cell if allowed with penalty on
                            * failure
                            */
-                    Cell neighborKill = getNeighbor(x, y, facing);
-                    if (accessAllowed(neighborKill, reg, false)) {
-                        if (neighborKill.generation > 2) {
-                            statCounters.viableCellsKilled++;
-                        }
+                        Cell neighborKill = getNeighbor(x, y, facing);
+                        if (accessAllowed(neighborKill, reg, false)) {
+                            if (neighborKill.generation > 2) {
+                                statCounters.viableCellsKilled++;
+                            }
                         /*
                          * putting a STOP instruction as first instruction will kill the
                          * neighboring cell
                          */
-                        neighborKill.genome[0] = 15;
-                        neighborKill.ID = cellIdCounter;
-                        neighborKill.parentID = 0;
-                        neighborKill.lineage = cellIdCounter;
-                        neighborKill.generation = 0;
+                            neighborKill.genome[0] = 15;
+                            neighborKill.ID = cellIdCounter;
+                            neighborKill.parentID = 0;
+                            neighborKill.lineage = cellIdCounter;
+                            neighborKill.generation = 0;
 
-                        cellIdCounter++;
+                            cellIdCounter++;
 
-                    } else if (neighborKill.generation > 2) {
-                        c.energy /= FAILED_KILL_PENALTY;
-                    }
-                    break;
-                case 0xe: /*
+                        } else if (neighborKill.generation > 2) {
+                            c.energy /= FAILED_KILL_PENALTY;
+                        }
+                        break;
+                    case 0xe: /*
                            * SHARE: Equalize energy between self and neighbor if allowed
                            */
-                    Cell neighborShare = getNeighbor(x, y, facing);
-                    if (accessAllowed(neighborShare, reg, true)) {
-                        if (neighborShare.generation > 2) {
-                            statCounters.viableCellShares++;
+                        Cell neighborShare = getNeighbor(x, y, facing);
+                        if (accessAllowed(neighborShare, reg, true)) {
+                            if (neighborShare.generation > 2) {
+                                statCounters.viableCellShares++;
+                            }
+                            int newEnergy = (c.energy + neighborShare.energy) / 2;
+                            c.energy = newEnergy;
+                            neighborShare.energy = newEnergy;
                         }
-                        int newEnergy = (c.energy + neighborShare.energy) / 2;
-                        c.energy = newEnergy;
-                        neighborShare.energy = newEnergy;
-                    }
-                    break;
-                case 0xf: /* STOP: End execution */
-                    stop = true;
-                    break;
+                        break;
+                    case 0xf: /* STOP: End execution */
+                        stop = true;
+                        break;
                 }
             }
 
@@ -585,21 +577,21 @@ public class NanoPond {
                         int type = rg.nextInt(3);
                         switch (type) {
                         /* replacement */
-                        case 0:
-                            neighbor.genome[i++] = (byte) rg.nextInt(16);
-                            j++;
-                            break;
+                            case 0:
+                                neighbor.genome[i++] = (byte) rg.nextInt(16);
+                                j++;
+                                break;
                         /* duplicate instruction execution */
-                        case 1:
-                            neighbor.genome[i++] = outputBuf[j];
-                            i %= POND_DEPTH;
-                            neighbor.genome[i++] = outputBuf[j++];
-                            break;
+                            case 1:
+                                neighbor.genome[i++] = outputBuf[j];
+                                i %= POND_DEPTH;
+                                neighbor.genome[i++] = outputBuf[j++];
+                                break;
                         /* skip instruction */
-                        case 2:
-                            i++;
-                            j++;
-                            break;
+                            case 2:
+                                i++;
+                                j++;
+                                break;
                         }
                     } else {
                         /* no mutation */
@@ -611,9 +603,9 @@ public class NanoPond {
     }
 
     private String hexa(byte[] genome) {
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < genome.length; i++) {
-            out.append(Integer.toHexString(genome[i]));
+        StringBuilder out = new StringBuilder();
+        for (byte aGenome : genome) {
+            out.append(Integer.toHexString(aGenome));
         }
         return out.substring(0, out.indexOf("ff") + 1);
     }
