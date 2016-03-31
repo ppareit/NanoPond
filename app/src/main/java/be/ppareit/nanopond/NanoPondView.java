@@ -40,6 +40,9 @@ import be.ppareit.nanopond.NanoPond.Cell;
  */
 public class NanoPondView extends GameLoopView {
 
+    private static final float MIN_SCALE =  1.0f;
+    private static final float MAX_SCALE = 40.0f;
+
     public enum State {
         RUNNING, PAUSED,
     }
@@ -153,7 +156,7 @@ public class NanoPondView extends GameLoopView {
 
             // limit zooming
             final float scale = factor * getScale();
-            if (scale < 1.f || 20.f < scale) {
+            if (scale < MIN_SCALE || MAX_SCALE < scale) {
                 return false;
             }
 
