@@ -8,8 +8,8 @@ android {
         applicationId "be.ppareit.nanopond"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 10100
-        versionName "1.1"
+        versionCode 10101
+        versionName "1.1.1"
     }
     buildTypes {
         release {
