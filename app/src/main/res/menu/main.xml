@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_feedback"
+        android:orderInCategory="101"
+        android:title="@string/action_feedback"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="102"
+        android:title="@string/action_about"
+        android:showAsAction="never" />
     <item
         android:id="@+id/action_editcell"
         android:showAsAction="always"

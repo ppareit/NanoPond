@@ -1,11 +1,15 @@
 package be.ppareit.nanopond;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
@@ -73,10 +77,37 @@ public class NanoPondActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_editcell) {
-            showDialog(DIALOG_EDITCELL);
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_feedback:
+                String to = "pieter.pareit@gmail.com";
+                String subject = "Nanopond feedback";
+                String message = "Device: " + Build.MODEL + "\nAndroid version: "
+                        + Build.VERSION.RELEASE + "\nFeedback: \n";
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+                email.putExtra(Intent.EXTRA_SUBJECT, subject);
+                email.putExtra(Intent.EXTRA_TEXT, message);
+                email.setType("message/rfc822");
+                startActivity(email);
+
+                break;
+            case R.id.action_about:
+                AlertDialog ad = new AlertDialog.Builder(this)
+                        .setTitle(R.string.about_dlg_title)
+                        .setMessage(R.string.about_dlg_message)
+                        .setPositiveButton(getText(android.R.string.ok), null)
+                        .create();
+                ad.show();
+                Linkify.addLinks((TextView) ad.findViewById(android.R.id.message),
+                        Linkify.ALL);
+                break;
+            case R.id.action_editcell:
+                showDialog(DIALOG_EDITCELL);
+                break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

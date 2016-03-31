@@ -1,11 +1,39 @@
 <resources>
     <string name="app_name">NanoPond</string>
 
-    <string name="menu_edit_title">Edit</string>
+    <string name="action_feedback">
+        Feedback
+    </string>
+    <string name="action_about">
+        About
+    </string>
+
+    <string name="menu_edit_title">
+        Edit
+    </string>
 
     <string name="hexa_label">Hexa</string>
 
     <string name="no_cell_active_msg">
         There is no cell active. Select a cell first.
     </string>
+
+    <string name="about_dlg_title">
+        About NanoPond
+    </string>
+    <string name="about_dlg_message">
+        NanoPond is copyrighted by Pieter Pareit (pieter.pareit@gmail.com). The
+        artwork was created by Birgit Niemegeers.\n\n
+
+        NanoPond runs a virtual machine in which \'life\' can develop. This virtual
+        machine is a port of a java program by Thomas Abeel, who in turn based his
+        virtual machine on the c code of Adam Ierymenko. NanoPond was used in a
+        Computational Intelligence course at the university of Ghent.\n\n
+
+        This program is released under the GNU Public License Version 3. The programs
+        on which it is based where released under the GPL 2.\n\n
+
+        This program comes with absolutely no warranty.
+    </string>
+
 </resources>
