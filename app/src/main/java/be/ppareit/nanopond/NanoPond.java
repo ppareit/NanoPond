@@ -280,24 +280,49 @@ public class NanoPond {
         }
     }
 
+    volatile boolean isRunning = false;
+
+    Thread thread = null;
+
     public void run() {
 
-        new Thread(() -> {
-            int threadCounter = 0;
-            while (true) {
-                // every 1000 steps we give the system some extra breathing time
-                if (threadCounter % 1000 == 0) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        if (thread == null) {
+            isRunning = true;
+            thread = new Thread(() -> {
+                int threadCounter = 0;
+                while (true) {
+                    if (threadCounter % 1000 == 0) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (isRunning == false) {
+                            return;
+                        }
                     }
+                    singleStep();
+                    ++threadCounter;
                 }
-                singleStep();
-                ++threadCounter;
-            }
-        }).start();
+            });
+            thread.start();
+        }
+    }
 
+    public void pauze() {
+        if (thread != null) {
+            isRunning = false;
+            boolean retry = true;
+            while (retry) {
+                try {
+                    thread.join();
+                    retry = false;
+                } catch (InterruptedException e) {
+                    // swallow
+                }
+            }
+            thread = null;
+        }
     }
 
     /* Clock is incremented on each core loop */

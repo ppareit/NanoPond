@@ -103,6 +103,14 @@ public class NanoPondActivity extends Activity {
                 Linkify.addLinks((TextView) ad.findViewById(android.R.id.message),
                         Linkify.ALL);
                 break;
+            case R.id.action_run:
+                mGridView.setMode(NanoPondView.State.RUNNING);
+                mNanopond.run();
+                break;
+            case R.id.action_pause:
+                mGridView.setMode(NanoPondView.State.PAUSED);
+                mNanopond.pauze();
+                break;
             case R.id.action_editcell:
                 showDialog(DIALOG_EDITCELL);
                 break;
@@ -132,7 +140,7 @@ public class NanoPondActivity extends Activity {
         }
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.editcell);
-        dialog.setTitle(R.string.menu_edit_title);
+        dialog.setTitle(R.string.edit_title);
         final TextView hexaText = (TextView) dialog.findViewById(id.hexa_edit);
         final Button okButton = (Button) dialog.findViewById(id.ok);
         final int activeX = mGridView.getActiveCellCol();

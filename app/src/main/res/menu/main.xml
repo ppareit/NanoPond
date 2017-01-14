@@ -5,17 +5,27 @@
     <item
         android:id="@+id/action_feedback"
         android:orderInCategory="101"
-        android:title="@string/action_feedback"
+        android:title="@string/feedback_title"
         android:showAsAction="never" />
     <item
         android:id="@+id/action_about"
         android:orderInCategory="102"
-        android:title="@string/action_about"
+        android:title="@string/about_title"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_run"
+        android:icon="@android:drawable/ic_media_play"
+        android:showAsAction="always"
+        android:title="@string/run_title"/>
+    <item
+        android:id="@+id/action_pause"
+        android:icon="@android:drawable/ic_media_pause"
+        android:showAsAction="always"
+        android:title="@string/pause_title"/>
     <item
         android:id="@+id/action_editcell"
         android:showAsAction="always"
         android:icon="@android:drawable/ic_menu_edit"
-        android:title="@string/menu_edit_title" />
+        android:title="@string/edit_title" />
 
 </menu>

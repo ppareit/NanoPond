@@ -1,15 +1,22 @@
 <resources>
     <string name="app_name">NanoPond</string>
 
-    <string name="action_feedback">
+    <string name="feedback_title">
         Feedback
     </string>
-    <string name="action_about">
+    <string name="about_title">
         About
     </string>
 
-    <string name="menu_edit_title">
+    <string name="edit_title">
         Edit
+    </string>
+
+    <string name="run_title">
+        Run
+    </string>
+    <string name="pause_title">
+        Pause
     </string>
 
     <string name="hexa_label">Hexa</string>
