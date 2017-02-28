@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nanopond Help</title>
+</head>
+<body>
+Nanopond is just what it says: a very very small and simple artificial
+life virtual machine.
+</p>
+
+It is a "small evolving program" based artificial life system of the same
+general class as Tierra, Avida, and Archis.
+</p>
+
+<h1>How Nanopond works:</h1>
+
+The Nanopond world is called a <em>pond</em>. It is an NxM two dimensional
+array of <em>cell</em> structures, and it wraps at the edges (it's toroidal).
+Each cell has an energy, a genome ( that is an array of POND_DEPTH four-bit
+values), an id and a parent id. Dead cell's have an id of zero.
+</p>
+
+The first four bit value in the genome is called the <em>logo</em>. What that is
+for will be explained later. The remaining four bit values each code for
+one of 16 instructions:
+
+
+<ul>
+    <li>ZERO (0x0): Zero VM state registers</li>
+    <li>FWD (0x1): Increment the pointer (wrap at end)</li>
+    <li>BACK (0x2): Decrement the pointer (wrap at beginning)</li>
+    <li>INC (0x3): Increment the register</li>
+    <li>DEC (0x4): Decrement the register</li>
+    <li>READG (0x5): Read into the register from genome</li>
+    <li>WRITEG (0x6): Write out from the register to genome</li>
+    <li>READB (0x7): Read into the register from buffer</li>
+    <li>WRITEB (0x8): Write out from the register to buffer</li>
+    <li>LOOP (0x9): Jump forward to matching REP if register is zero</li>
+    <li>REP (0xa): Jump back to matching LOOP if register is nonzero</li>
+    <li>TURN (0xb): Turn in the direction specified by register</li>
+    <li>XCHG (0xc): Skip next instruction and exchange value of register with it</li>
+    <li>KILL (0xd): Blow away neighboring cell if allowed with penalty on failure</li>
+    <li>SHARE (0xe): Equalize energy between self and neighbor if allowed</li>
+    <li>STOP (0xf): End execution</li>
+</ul>
+
+The instructions are exceptionless and lack fragile
+operands. This means that any arbitrary sequence of instructions will
+always run and will always do something. This is called an evolvable
+instruction set, because programs coded in an instruction set with these
+basic characteristics can mutate. The instruction set is also
+Turing-complete, which means that it can theoretically do anything any
+computer can do.
+</p>
+
+At the center of Nanopond is a core loop. Each time this loop executes,
+a clock counter is incremented and one or more things happen:
+
+<ul>
+    <li>Every INFLOW_FREQUENCY clock ticks a random (x,y) location is picked,
+        energy is added (see INFLOW_RATE_MEAN and INFLOW_RATE_DEVIATION)
+        and it's genome is filled with completely random bits. Statistics
+        are also reset to generation==0 and parentID==0 and a new cell ID
+        is assigned.
+    </li>
+    <li>Every tick a random (x,y) location is picked and the genome inside is
+        executed until a STOP instruction is encountered or the cell's
+        energy counter reaches zero. (Each instruction costs one unit energy.)
+    </li>
+</ul>
+
+The cell virtual machine is an extremely simple register machine with
+a single four bit register, one memory pointer, one spare memory pointer
+that can be exchanged with the main one, and an output buffer. When
+cell execution starts, this output buffer is filled with all binary 1's
+(0xffff....). When cell execution is finished, if the first byte of
+this buffer is *not* 0xff, then the VM says "hey, it must have some
+data!". This data is a candidate offspring; to reproduce cells must
+copy their genome data into the output buffer.
+</p>
+
+When the VM sees data in the output buffer, it looks at the cell
+adjacent to the cell that just executed and checks whether or not
+the cell has permission (see below) to modify it. If so, then the
+contents of the output buffer replace the genome data in the
+adjacent cell. Statistics are also updated: parentID is set to the
+ID of the cell that generated the output and generation is set to
+one plus the generation of the parent.
+</p>
+
+A cell is permitted to access a neighboring cell if:
+<ul>
+    <li>That cell's energy is zero</li>
+    <li>That cell's parentID is zero</li>
+    <li>That cell's logo (remember?) matches the trying cell's <em>guess</em></li>
+</ul>
+
+Since randomly introduced cells have a parentID of zero, this allows
+real living cells to always replace them or eat them.
+</p>
+
+The guess is merely the value of the register at the time that the
+access attempt occurs.
+</p>
+
+Permissions determine whether or not an offspring can take the place
+of the contents of a cell and also whether or not the cell is allowed
+to EAT (an instruction) the energy in it's neighbor.
+</p>
+
+If you haven't realized it yet, this is why the final permission
+criteria is comparison against what is called a "guess." In conjunction
+with the ability to "eat" neighbors' energy, guess what this permits?
+</p>
+
+Since this is an evolving system, there have to be mutations. The
+MUTATION_RATE sets their probability. Mutations are random variations
+with a frequency defined by the mutation rate to the state of the
+virtual machine while cell genomes are executing. Since cells have
+to actually make copies of themselves to replicate, this means that
+these copies can vary if mutations have occurred to the state of the
+VM while copying was in progress.
+</p>
+
+What results from this simple set of rules is an evolutionary game of
+<em>corewar</em>. In the beginning, the process of randomly generating cells
+will cause self-replicating viable cells to spontaneously emerge. This
+is something I call <em>random genesis</em>, and happens when some of the
+random gak turns out to be a program able to copy itself. After this,
+evolution by natural selection takes over. Since natural selection is
+most certainly not random, things will start to get more and more
+ordered and complex (in the functional sense). There are two commodities
+that are scarce in the pond: space in the NxM grid and energy. Evolving
+cells compete for access to both.
+</p>
+
+Nanopond, for it's simplicity, manifests some really interesting
+evolutionary dynamics. While I haven't run the kind of multiple-
+month-long experiment necessary to really see this (I might!), it
+would appear that evolution in the pond doesn't get stuck on just
+one or a few forms the way some other simulators are apt to do.
+I think simplicity is partly reponsible for this along with what
+biologists call embeddedness, which means that the cells are a part
+of their own world.
+</p>
+
+Run it for a while... the results can be... interesting!
+</p>
+
+Have fun!
+</p>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,11 +18,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
+import be.ppareit.android.ResourcesLib;
 import be.ppareit.nanopond.NanoPond.Cell;
 import be.ppareit.nanopond.R.id;
 
@@ -40,7 +45,9 @@ public class NanoPondActivity extends Activity {
     private View mRaportView;
     private View mDetailView;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +87,23 @@ public class NanoPondActivity extends Activity {
         int id = item.getItemId();
 
         switch (id) {
+            case R.id.action_help:
+                try {
+                    Resources res = getResources();
+                    CharSequence message = ResourcesLib.openRawTextFile(res, R.raw.help);
+                    WebView webView = new WebView(this);
+                    webView.loadDataWithBaseURL(null, String.valueOf(message),
+                            "text/html", "utf-8", null);
+                    AlertDialog alertDialog = new AlertDialog.Builder(this)
+                            .setTitle(R.string.help_title)
+                            .setView(webView)
+                            .setPositiveButton(getText(android.R.string.ok), null)
+                            .create();
+                    alertDialog.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
             case R.id.action_feedback:
                 String to = "pieter.pareit@gmail.com";
                 String subject = "Nanopond feedback";
@@ -121,9 +145,9 @@ public class NanoPondActivity extends Activity {
     @Override
     public Dialog onCreateDialog(int id) {
         switch (id) {
-        case DIALOG_EDITCELL:
-            createEditCellDialog();
-            break;
+            case DIALOG_EDITCELL:
+                createEditCellDialog();
+                break;
         }
         return super.onCreateDialog(id);
     }
@@ -176,9 +200,8 @@ public class NanoPondActivity extends Activity {
 
     /**
      * This makes the given existing childView floatable on top of the mainView.
-     * 
-     * @param childView
-     *            Child view to make floatable
+     *
+     * @param childView Child view to make floatable
      */
     private void makeViewFloatable(View childView) {
         // the child view begins window dragging on a long click
@@ -192,7 +215,7 @@ public class NanoPondActivity extends Activity {
                 v.startDrag(null, new View.DragShadowBuilder(v) {
                     @Override
                     public void onProvideShadowMetrics(Point shadowSize,
-                            Point shadowTouchPoint) {
+                                                       Point shadowTouchPoint) {
                         super.onProvideShadowMetrics(shadowSize, shadowTouchPoint);
                         shadowTouchPoint.y = 10;
                     }
@@ -203,35 +226,35 @@ public class NanoPondActivity extends Activity {
         // the main view repositions the child views
         mMainView.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
-            case DragEvent.ACTION_DRAG_STARTED: {
-                Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
-                // need to return true to keep getting drag/drop related
-                // messages
-                return true;
-            }
-            case DragEvent.ACTION_DRAG_ENDED: {
-                Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
-                // the child view is put in the localstate
-                View cv = (View) event.getLocalState();
-                // make visible again at the new position
-                cv.setVisibility(View.VISIBLE);
-                return true;
-            }
-            case DragEvent.ACTION_DROP: {
-                Log.v(TAG, "onDrag : ACTION_DROP");
-                // the child view is put in the localstate
-                View cv = (View) event.getLocalState();
-                // calling setLeft/setTop only works if layout is not yet
-                // set at 'runtime', we need to use the setTranslationX/Y
-                // functions
-                float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
-                float dy = event.getY() - cv.getTop() - 10;
-                cv.setTranslationX(dx);
-                cv.setTranslationY(dy);
-                return true;
-            }
-            default:
-                return false;
+                case DragEvent.ACTION_DRAG_STARTED: {
+                    Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
+                    // need to return true to keep getting drag/drop related
+                    // messages
+                    return true;
+                }
+                case DragEvent.ACTION_DRAG_ENDED: {
+                    Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
+                    // the child view is put in the localstate
+                    View cv = (View) event.getLocalState();
+                    // make visible again at the new position
+                    cv.setVisibility(View.VISIBLE);
+                    return true;
+                }
+                case DragEvent.ACTION_DROP: {
+                    Log.v(TAG, "onDrag : ACTION_DROP");
+                    // the child view is put in the localstate
+                    View cv = (View) event.getLocalState();
+                    // calling setLeft/setTop only works if layout is not yet
+                    // set at 'runtime', we need to use the setTranslationX/Y
+                    // functions
+                    float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
+                    float dy = event.getY() - cv.getTop() - 10;
+                    cv.setTranslationX(dx);
+                    cv.setTranslationY(dy);
+                    return true;
+                }
+                default:
+                    return false;
             }
         });
     }
