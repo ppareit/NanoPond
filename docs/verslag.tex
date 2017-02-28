@@ -1,0 +1,195 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[dutch]{babel}
+\usepackage{graphicx}
+\usepackage{amssymb, amsmath, subfigure}
+\usepackage{listings}
+\usepackage{alltt}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\lstset{language=Java}
+
+
+\textwidth 16cm \textheight 23cm \evensidemargin 0cm
+\oddsidemargin 0cm \topmargin -2cm
+\parindent 0pt
+\parskip \medskipamount
+
+%opening
+\title{\textbf{Nanopond} -- genetisch programmeren\\
+       \small{Practische sessie 2}\\
+       \small{Computationele intelligentie}\\
+       \small{Academiejaar 2010-2011} }
+\author{Pieter Pareit}
+
+\begin{document}
+
+\maketitle
+
+\section{Program X}
+Het volgende programma zal met een minimale verzameling van instructies reproduceerbaar zijn:
+\begin{alltt}
+READG    {\em % zet register \(\neq 0\)}
+LOOP     {\em % als register \(= 0\) spring voorwaarts naar bijhorende} REP
+READG    {\em % plaats waarde van gnome op huidige positie in register}
+WRITEB   {\em % schrijf waarde van register naar buffer op huidige positie}
+FWD      {\em % verhoog de positie met \'e\'en}
+REP      {\em % als \(\neq 0\) spring terug naar bijhorende} LOOP{\em instructie}
+ZERO     {\em % zorg dat het programma een \(0\) in het register plaatst}
+\end{alltt}
+
+Voor de eerste instructie zijn een aantal verschillende mogelijkheden. De instructies \verb"INC", \verb"DEC", \verb"READG" en \verb"READB" plaatsen respectievelijk de waarden \verb"0x1", \verb"0xf", \verb"0x5" en \verb"0xf" in het register. In het verdere verloop van het programma wordt nog eens \verb"READG" gebruikt. Dus hier is het minimale programma één die $6$ verschillende instructies nodig heeft, $7$ instructies plaatst in het genoom, en het verbruikt $2+7\cdot 4+1=31$ eenheden energie tijdens het uitvoeren.
+
+\section{Mutation}
+De volgende code implementeert variatie in de wereld door tijdens het uitvoeren van een genome soms een genome te wijzigen, soms het huidige register te wijzigen, soms een instructie tweemaal uit te voeren of soms een instructie over te slaan.
+\begin{lstlisting}[frame=btrl,numbers=left,firstnumber=370]
+if (rg.nextDouble() < MUTATION_RATE) {
+    int type = rg.nextInt(4);
+    switch (type) {
+        /* replacement */
+        case 0:
+            c.genome[instructionIndex] = (byte) rg.nextInt(16);
+            break;
+        /* change register */
+        case 1:
+            reg = (byte) rg.nextInt(16);
+            break;
+        /* duplicate instruction execution */
+        case 2:
+            if (instructionIndex == 0) {
+                instructionIndex = POND_DEPTH;
+            }
+            instructionIndex--;
+            break;
+        /* skip instruction */
+        case 3:
+            instructionIndex++;
+            instructionIndex %= POND_DEPTH;
+            break;
+    }
+}
+\end{lstlisting}
+De code om een instructie te dupliceren, dupliceert eigenlijk niet de huidige instructie, maar de vorige. Dit maakt niet echt een verschil uit. Er wordt instructie-wrap voorzien, anders zou de laatste instructie nooit dubbel uitgevoerd worden. Alternatief zou de code nooit een instructie-duplicatie kunnen doen wanneer de index gelijk aan nul is.
+
+De volgende code introduceert sporadisch een fout tijdens het kopiëren van een cel zijn buffer naar één van zijn buren:
+\begin{lstlisting}[frame=btrl,numbers=left,firstnumber=570]
+int i = 0, j = 0;
+while (i < POND_DEPTH && j < POND_DEPTH) {
+    if (rg.nextDouble() < MUTATION_RATE) {
+        int type = rg.nextInt(3);
+        switch (type) {
+            /* replacement */
+            case 0:
+                neighbor.genome[i++] = (byte) rg.nextInt(16);
+                j++;
+                break;
+            /* duplicate instruction execution */
+            case 1:
+                neighbor.genome[i++] = outputBuf[j];
+                i %= POND_DEPTH;
+                neighbor.genome[i++] = outputBuf[j++];
+                break;
+            /* skip instruction */
+            case 2:
+                i++;
+                j++;
+                break;
+        }
+    } else {
+        /* no mutation */
+        neighbor.genome[i++] = outputBuf[j++];
+    }
+}
+\end{lstlisting}
+Een alternatief dat sneller loopt, maar waarvan dan een extra mutatie snelheid moet worden bepaald is de volgende. Eerst wordt de output buffer met een snelle \verb"arraycopy" gekopieerd naar het buur genoom. Daarna wordt willekeurig (met een te bepalen mutatie snelheid) de kopie geselecteerd om mutaties te ondergaan. Enkel indien geselecteerd, wordt het tragere algoritme uitgevoerd.
+
+\section{World domination}
+
+Programma's die succesvol zijn moeten een korte uitvoeringstijd hebben, zichzelf in de buffer plaatsen, energie van naburige programma's overnemen en naburige programma's verwijderen. Door de vereisten van korte uitvoeringstijd en zichzelf kopiëren zijn alle succesvolle programma's kleine varianties van \textit{Programma X}. Energie overnemen van buren kan door \verb"SHARE" instructies binnen loops uit te voeren. De \verb"KILL" instructie is verraderlijk omdat de eigen energie wordt gehalveerd bij falen. De kans tot falen wordt beïnvloed door de waarde van het register en door de waarden van de eerste instructie van het naburige programma dat aangevallen wordt, hoe meer verschillende bits tussen het register en de eerste instructie, hoe beter de kans.
+
+Volgend programma \textit{zou} daardoor succesvol moeten zijn:
+\begin{alltt}
+READG
+INC**4   {\em % voer} INC{\em viermaal na elkaar uit}
+KILL
+LOOP
+READG
+WRITEB
+SHARE
+FWD
+REP
+ZERO
+\end{alltt}
+
+De hex-code van dit programma is \verb"0x53333d958e1a0f". Volgende variantie's bleken beter: \verb"0xd7d9581ea0f" en \verb"0xdd7de9581a0f".
+
+Verder werd ook een programma ontwikkeld dat in twee fases werkt. De countdown fase, en de payload fase. Bedoeling van de countdown fase is om zo snel mogelijk een weg af te leggen, de bedoeling van de payload fase is om zich ergens te settelen en daar zo min mogelijk energie te verbruiken en erg defensief te zijn. De payload fase was echter efficiënter (minder energie verbruiken) dan de countdown fase en daardoor haalde de tweede fase vaak de eerste fase in.
+
+\begin{alltt}
+READB    {\em % maak register \(\neq 0\)}
+LOOP     {\em % zoek naar }XCHG{\em in eigen code}
+FWD
+READG
+INC**4
+REP
+FWD
+READG    {\em % lees counter}
+DEC      {\em % tel één af}
+LOOP     {\em % als register \(=0\), spring naar de payload fase}
+XCHG
+STOP
+LOOP     {\em % ga met programma-pointer terug naar begin programma}
+BACK
+READG
+INC
+REP
+INC
+LOOP     {\em % kopieer nu eigen programma in buffer}
+READG
+KILL
+WRITEB
+FWD
+SHARE
+REP
+STOP     {\em % countdown fase volledig, stop nu}
+REP
+DEC      {\em % wrap counter, dus herbegin tellen vanaf }STOP
+WRITEG
+LOOP     {\em % plaats programma-pointer op nul}
+BACK
+READG
+INC
+REP
+FWD      {\em % dump payload in buffer}
+INC**3
+WRITEG
+FWD
+DEC**6
+WRITEG
+FWD
+DEC**4
+WRITEG
+FWD
+DEC**4
+WRITEG
+FWD
+INC**3
+WRITEG
+FWD
+DEC**7
+WRITEG
+FWD
+DEC**3
+WRITEG
+FWD
+DEC**4
+WRITEG
+FWD
+INC**6
+WRITEG
+FWD
+ZERO
+\end{alltt}
+
+\end{document}
