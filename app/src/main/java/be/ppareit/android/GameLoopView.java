@@ -29,6 +29,8 @@ import android.view.SurfaceView;
 
 import net.vrallev.android.cat.Cat;
 
+import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
+
 
 /**
  * This class contains all logic related to running a game loop.<p>
@@ -76,9 +78,12 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
             while (!surfaceCreatedCompleted) {
             }
 
-            // run the gameloop
             while (mRun) {
+                // give the system some time to run
+                sleepIgnoreInterrupt(1);
+                // update logic
                 onUpdate();
+                // redraw canvas
                 Canvas canvas = null;
                 try {
                     canvas = mSurfaceHolder.lockCanvas();
@@ -111,11 +116,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
             mNextGameTick += 1000 / mTargetFps;
             long sleepTime = mNextGameTick - System.currentTimeMillis();
             if (sleepTime >= 0) {
-                try {
-                    sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                sleepIgnoreInterrupt(sleepTime);
             } else {
                 Log.i("GameLoopView", "Failed to reach expected FPS!");
             }
@@ -152,7 +153,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
     }
 
     private AnimationThread mThread = null;
-    private int mTargetFps = 0;
+    private int mTargetFps = 30;
     private boolean mDrawFps = true;
 
     public GameLoopView(Context context, AttributeSet attrs) {

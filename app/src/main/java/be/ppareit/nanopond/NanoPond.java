@@ -25,6 +25,8 @@ package be.ppareit.nanopond;
 
 import android.util.Log;
 
+import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
+
 public class NanoPond {
 
     private static final String TAG = NanoPond.class.getSimpleName();
@@ -290,16 +292,9 @@ public class NanoPond {
             isRunning = true;
             thread = new Thread(() -> {
                 int threadCounter = 0;
-                while (true) {
-                    if (threadCounter % 1000 == 0) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (isRunning == false) {
-                            return;
-                        }
+                while (isRunning) {
+                    if (threadCounter % 1013 == 0) {
+                        sleepIgnoreInterrupt(1);
                     }
                     singleStep();
                     ++threadCounter;

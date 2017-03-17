@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">NanoPond</string>
 
+    <string name="help_title">
+        Help
+    </string>
     <string name="feedback_title">
         Feedback
     </string>
