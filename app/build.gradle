@@ -11,8 +11,8 @@ android {
         applicationId "be.ppareit.nanopond"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 10101
-        versionName "1.1.1"
+        versionCode 10200
+        versionName "1.2.0"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
     buildTypes {

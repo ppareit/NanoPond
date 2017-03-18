@@ -1,11 +1,18 @@
+Version 1.2.0 (18/03/2017)
+  + Add Run/Stop buttons
+  + Add help menu with rules of nanopond
+  + Updated artwork of launcher icons
+  * Improved reactiveness of android
+
 Version 1.1.1 (30/03/2016)
-* Improved threading speed, will noticable run faster
-* Improved gui on android hdi devices
-* Fixed lint warnings
-* Scale fine tuning
-+ Add feedback and about menu
+  * Improved threading speed, will noticeable run faster
+  * Improved gui on android hdi devices
+  * Fixed lint warnings
+  * Scale fine tuning
+  + Add feedback and about menu
+
 Version 1.1 (02/01/2016)
-* Use matrices to handle panning and scaling
-* Fix resizing when keyboard is displayed
-* Bug fixes
+  * Use matrices to handle panning and scaling
+  * Fix resizing when keyboard is displayed
+  * Bug fixes
 
