@@ -33,7 +33,6 @@ import android.view.WindowManager;
 import net.vrallev.android.cat.Cat;
 
 import be.ppareit.android.GameLoopView;
-import be.ppareit.nanopond.NanoPond.Cell;
 
 /**
  *

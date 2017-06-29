@@ -19,7 +19,7 @@ public class ResourcesLib {
              BufferedReader reader = new BufferedReader(new InputStreamReader(ins))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                result.append(line + "\n");
+                result.append(line).append("\n");
             }
         }
         return result;

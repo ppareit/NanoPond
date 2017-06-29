@@ -30,7 +30,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'net.vrallev.android:cat:1.0.2'
+    compile 'net.vrallev.android:cat:1.0.5'
 }
 
 android {

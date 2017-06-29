@@ -23,8 +23,6 @@
  */
 package be.ppareit.nanopond;
 
-import android.util.Log;
-
 import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
 
 public class NanoPond {
@@ -63,7 +61,6 @@ public class NanoPond {
      * try to KILL a viable cell neighbor and fail. Higher numbers mean lower penalties.
      */
     public static final int FAILED_KILL_PENALTY = 2;
-    byte[] startBuffer = new byte[POND_DEPTH];
 
     enum Direction {
 
@@ -81,56 +78,6 @@ public class NanoPond {
                     return DOWN;
                 default:
                     throw new RuntimeException("Unknown direction requested: " + i);
-            }
-        }
-    }
-
-    public class Cell {
-
-        long generation;
-        long ID;
-        long parentID;
-        long lineage;
-        int energy;
-        byte[] genome;
-
-        public Cell() {
-            this.ID = 0;
-            this.parentID = 0;
-            this.lineage = 0;
-            this.generation = 0;
-            this.energy = 0;
-            this.genome = new byte[POND_DEPTH];
-            System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
-        }
-
-        /**
-         * Fill genome of the cell with random instruction
-         */
-        public void setRandomGenome() {
-            for (int i = 0; i < POND_DEPTH; i++) {
-                genome[i] = (byte) rg.nextInt(16);
-            }
-        }
-
-        public String getHexa() {
-            return hexa(genome);
-        }
-
-        public void setGenome(String hex) {
-            System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
-            for (int i = 0; i < hex.length(); ++i) {
-                char ch = hex.charAt(i);
-                if ('0' <= ch && ch <= '9') {
-                    genome[i] = (byte) (ch - '0');
-                } else if ('a' <= ch && ch <= 'f') {
-                    genome[i] = (byte) (ch - 'a' + 10);
-                } else if ('A' <= ch && ch <= 'F') {
-                    genome[i] = (byte) (ch - 'A' + 10);
-                } else {
-                    Log.e(TAG, "Failed to parse hex string for the genome");
-                    setRandomGenome();
-                }
             }
         }
     }
@@ -272,9 +219,6 @@ public class NanoPond {
      * Constructor of the world : fill all genomes with 512 STOP's
      */
     public NanoPond() {
-        for (int i = 0; i < POND_DEPTH; i++) {
-            startBuffer[i] = (byte) 0xf; /* STOP instruction */
-        }
         for (int i = 0; i < POND_SIZE_X; i++) {
             for (int j = 0; j < POND_SIZE_Y; j++) {
                 pond[i][j] = new Cell();
@@ -328,9 +272,6 @@ public class NanoPond {
 
     private final double MUTATION_RATE = 0.000005;
 
-    /* Buffer used for execution output of candidate offspring */
-    private final byte[] outputBuf = new byte[POND_DEPTH];
-
     /* Virtual machine loop/rep stack */
     private final int loopStackPointer[] = new int[POND_DEPTH];
 
@@ -355,9 +296,7 @@ public class NanoPond {
             pond[x][y].parentID = 0;
             pond[x][y].lineage = cellIdCounter;
             pond[x][y].generation = 0;
-            pond[x][y].energy = INFLOW_RATE_BASE
-                    + (int) (rg.nextDouble() * INFLOW_RATE_VARIATION);
-
+            pond[x][y].energy = INFLOW_RATE_BASE + (int) (rg.nextDouble() * INFLOW_RATE_VARIATION);
             pond[x][y].setRandomGenome();
 
             cellIdCounter++;
@@ -369,7 +308,10 @@ public class NanoPond {
         Cell c = pond[x][y];
 
         /* Reset VM */
-        System.arraycopy(startBuffer, 0, outputBuf, 0, POND_DEPTH);
+        final byte[] outputBuf = new byte[POND_DEPTH];
+        for (int i = 0; i < POND_DEPTH; i++) {
+            outputBuf[i] = (byte) 0xf; /* STOP instruction */
+        }
         byte reg = 0;
         int pointer = 0;
         int loopStackPtr = 0;
@@ -620,14 +562,6 @@ public class NanoPond {
                 }
             }
         }
-    }
-
-    private String hexa(byte[] genome) {
-        StringBuilder out = new StringBuilder();
-        for (byte aGenome : genome) {
-            out.append(Integer.toHexString(aGenome));
-        }
-        return out.substring(0, out.indexOf("ff") + 1);
     }
 
     /* Used for unique seed ids */

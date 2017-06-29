@@ -27,7 +27,6 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import be.ppareit.android.ResourcesLib;
-import be.ppareit.nanopond.NanoPond.Cell;
 import be.ppareit.nanopond.R.id;
 
 import static be.ppareit.StringLib.isHexString;

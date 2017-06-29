@@ -17,7 +17,7 @@ public class DetailListAdapter extends BaseAdapter {
     NanoPondView mView;
     NanoPond mNanopond;
 
-    NanoPond.Cell mActiveCell = null;
+    Cell mActiveCell = null;
     int mActiveX = -1;
     int mActiveY = -1;
 
