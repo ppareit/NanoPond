@@ -1,16 +1,16 @@
 plugins {
-    id "me.tatarka.retrolambda" version "3.5.0"
+    id "me.tatarka.retrolambda" version "3.6.0"
 }
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "be.ppareit.nanopond"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 10200
         versionName "1.2.0"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
