@@ -110,12 +110,12 @@ public class DetailListAdapter extends BaseAdapter {
         return out.substring(0,out.indexOf("ff")+1);
     }
 
-    static String disassemble(byte[] genome, NanoPond np) {
-        String out = "";
+    static private String disassemble(byte[] genome, NanoPond np) {
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < genome.length; i++) {
-            out += i + "\t" + np.names[genome[i]] + "\n";
+            out.append(i).append("\t").append(np.names[genome[i]]).append("\n");
         }
-        return out;
+        return out.toString();
     }
 }
 
