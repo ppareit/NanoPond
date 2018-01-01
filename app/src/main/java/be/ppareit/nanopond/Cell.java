@@ -28,12 +28,12 @@ public class Cell {
 
 
     public Cell() {
-        this.ID = 0;
-        this.parentID = 0;
-        this.lineage = 0;
-        this.generation = 0;
-        this.energy = 0;
-        this.genome = new byte[POND_DEPTH];
+        ID = 0;
+        parentID = 0;
+        lineage = 0;
+        generation = 0;
+        energy = 0;
+        genome = new byte[POND_DEPTH];
         System.arraycopy(startBuffer, 0, genome, 0, POND_DEPTH);
     }
 
