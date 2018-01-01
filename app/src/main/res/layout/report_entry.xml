@@ -7,7 +7,7 @@
     android:background="#7AAA">
     <TextView
         android:id="@+id/entry_key"
-        android:text="Property"
+        android:text="@string/property"
         android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:background="#7AAA" />

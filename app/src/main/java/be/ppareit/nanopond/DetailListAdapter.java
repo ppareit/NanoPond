@@ -1,5 +1,23 @@
-package be.ppareit.nanopond;
+/*******************************************************************************
+ * Copyright (c) 2011 - 2018 Pieter Pareit.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contributors:
+ *     Pieter Pareit - initial API and implementation
+ ******************************************************************************/
 
+package be.ppareit.nanopond;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,16 +28,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-
 public class DetailListAdapter extends BaseAdapter {
 
-    Activity mActivity;
-    NanoPondView mView;
-    NanoPond mNanopond;
+    private Activity mActivity;
+    private NanoPondView mView;
+    private NanoPond mNanopond;
 
-    Cell mActiveCell = null;
-    int mActiveX = -1;
-    int mActiveY = -1;
+    private Cell mActiveCell = null;
+    private int mActiveX = -1;
+    private int mActiveY = -1;
 
     public DetailListAdapter(Context context, NanoPondView view, NanoPond np) {
         mActivity = (Activity) context;
@@ -59,23 +76,23 @@ public class DetailListAdapter extends BaseAdapter {
             return null;
         switch (position) {
         case 0:
-            return new Pair<String, String>("Lineage", String.valueOf(mActiveCell.lineage));
+            return new Pair<>("Lineage", String.valueOf(mActiveCell.lineage));
         case 1:
-            return new Pair<String, String>("Energy", String.valueOf(mActiveCell.energy));
+            return new Pair<>("Energy", String.valueOf(mActiveCell.energy));
         case 2:
-            return new Pair<String, String>("X", String.valueOf(mActiveX));
+            return new Pair<>("X", String.valueOf(mActiveX));
         case 3:
-            return new Pair<String, String>("Y", String.valueOf(mActiveY));
+            return new Pair<>("Y", String.valueOf(mActiveY));
         case 4:
-            return new Pair<String, String>("ID", String.valueOf(mActiveCell.ID));
+            return new Pair<>("ID", String.valueOf(mActiveCell.ID));
         case 5:
-            return new Pair<String, String>("ParentID", String.valueOf(mActiveCell.parentID));
+            return new Pair<>("ParentID", String.valueOf(mActiveCell.parentID));
         case 6:
-            return new Pair<String, String>("Generation", String.valueOf(mActiveCell.generation));
+            return new Pair<>("Generation", String.valueOf(mActiveCell.generation));
         case 7:
-            return new Pair<String, String>("Hexa", hexa(mActiveCell.genome));
+            return new Pair<>("Hexa", hexa(mActiveCell.genome));
         case 8:
-            return new Pair<String, String>("Disassemble", disassemble(mActiveCell.genome, mNanopond));
+            return new Pair<>("Disassemble", disassemble(mActiveCell.genome, mNanopond));
         }
         return null;
     }
@@ -92,8 +109,8 @@ public class DetailListAdapter extends BaseAdapter {
             LayoutInflater li = mActivity.getLayoutInflater();
             v = li.inflate(R.layout.report_entry, null);
         }
-        TextView keyView = (TextView) v.findViewById(R.id.entry_key);
-        TextView valueView = (TextView) v.findViewById(R.id.entry_value);
+        TextView keyView = v.findViewById(R.id.entry_key);
+        TextView valueView = v.findViewById(R.id.entry_value);
         Pair<String, String> item = getItem(position);
         if (item != null) {
             keyView.setText(item.first);

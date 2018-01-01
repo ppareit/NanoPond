@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,24 +23,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.vrallev.android.cat.Cat;
+
 import java.io.IOException;
 
-import be.ppareit.android.ResourcesLib;
 import be.ppareit.nanopond.R.id;
 
 import static be.ppareit.StringLib.isHexString;
+import static be.ppareit.android.Utils.openRawTextFile;
 
 public class NanoPondActivity extends Activity {
 
-    private static final String TAG = NanoPondActivity.class.getSimpleName();
-
-    private static final int DIALOG_EDITCELL = 0x010;
+    private static final int DIALOG_EDIT_CELL = 0x010;
 
     private NanoPond mNanopond = null;
 
     private View mMainView;
     private NanoPondView mGridView;
-    private View mRaportView;
+    private View mRapportView;
     private View mDetailView;
 
     /**
@@ -56,16 +55,16 @@ public class NanoPondActivity extends Activity {
 
         setContentView(R.layout.main);
         mMainView = findViewById(R.id.main);
-        mGridView = (NanoPondView) findViewById(R.id.nanopond_view);
+        mGridView = findViewById(R.id.nanopond_view);
 
-        ListView propertyList = (ListView) findViewById(R.id.report_property_list);
+        ListView propertyList = findViewById(R.id.report_property_list);
         ReportListAdapter rla = new ReportListAdapter(this, mNanopond);
         propertyList.setAdapter(rla);
 
-        mRaportView = findViewById(R.id.report_view);
-        makeViewFloatable(mRaportView);
+        mRapportView = findViewById(R.id.report_view);
+        makeViewFloatable(mRapportView);
 
-        ListView propertyList2 = (ListView) findViewById(R.id.detail_property_list);
+        ListView propertyList2 = findViewById(R.id.detail_property_list);
         DetailListAdapter dla = new DetailListAdapter(this, mGridView, mNanopond);
         propertyList2.setAdapter(dla);
 
@@ -89,7 +88,7 @@ public class NanoPondActivity extends Activity {
             case R.id.action_help:
                 try {
                     Resources res = getResources();
-                    CharSequence message = ResourcesLib.openRawTextFile(res, R.raw.help);
+                    CharSequence message = openRawTextFile(res, R.raw.help);
                     WebView webView = new WebView(this);
                     webView.loadDataWithBaseURL(null, String.valueOf(message),
                             "text/html", "utf-8", null);
@@ -135,7 +134,7 @@ public class NanoPondActivity extends Activity {
                 mNanopond.pauze();
                 break;
             case R.id.action_editcell:
-                showDialog(DIALOG_EDITCELL);
+                showDialog(DIALOG_EDIT_CELL);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -144,7 +143,7 @@ public class NanoPondActivity extends Activity {
     @Override
     public Dialog onCreateDialog(int id) {
         switch (id) {
-            case DIALOG_EDITCELL:
+            case DIALOG_EDIT_CELL:
                 createEditCellDialog();
                 break;
         }
@@ -156,7 +155,7 @@ public class NanoPondActivity extends Activity {
     }
 
     void createEditCellDialog() {
-        Log.d(TAG, "Creating the editcell dialog");
+        Cat.d("Creating the edit cell dialog");
         if (!mGridView.isCellActive()) {
             Toast.makeText(this, R.string.no_cell_active_msg, Toast.LENGTH_LONG).show();
             return;
@@ -164,8 +163,8 @@ public class NanoPondActivity extends Activity {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.editcell);
         dialog.setTitle(R.string.edit_title);
-        final TextView hexaText = (TextView) dialog.findViewById(id.hexa_edit);
-        final Button okButton = (Button) dialog.findViewById(id.ok);
+        final TextView hexaText = dialog.findViewById(id.hexa_edit);
+        final Button okButton = dialog.findViewById(id.ok);
         final int activeX = mGridView.getActiveCellCol();
         final int activeY = mGridView.getActiveCellRow();
         final Cell activeCell = mNanopond.pond[activeX][activeY];
@@ -207,7 +206,7 @@ public class NanoPondActivity extends Activity {
         childView.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Log.v(TAG, "onLongClick");
+                Cat.v("onLongClick");
                 // make invisible
                 v.setVisibility(View.INVISIBLE);
                 // the dragshadowbuilder will display an outline
@@ -226,13 +225,13 @@ public class NanoPondActivity extends Activity {
         mMainView.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED: {
-                    Log.v(TAG, "onDrag : ACTION_DRAG_STARTED");
+                    Cat.v("onDrag : ACTION_DRAG_STARTED");
                     // need to return true to keep getting drag/drop related
                     // messages
                     return true;
                 }
                 case DragEvent.ACTION_DRAG_ENDED: {
-                    Log.v(TAG, "onDrag : ACTION_DRAG_ENDED");
+                    Cat.v("onDrag : ACTION_DRAG_ENDED");
                     // the child view is put in the localstate
                     View cv = (View) event.getLocalState();
                     // make visible again at the new position
@@ -240,7 +239,7 @@ public class NanoPondActivity extends Activity {
                     return true;
                 }
                 case DragEvent.ACTION_DROP: {
-                    Log.v(TAG, "onDrag : ACTION_DROP");
+                    Cat.v("onDrag : ACTION_DROP");
                     // the child view is put in the localstate
                     View cv = (View) event.getLocalState();
                     // calling setLeft/setTop only works if layout is not yet

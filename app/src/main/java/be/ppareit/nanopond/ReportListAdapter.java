@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2011 - 2018 Pieter Pareit.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contributors:
+ *     Pieter Pareit - initial API and implementation
+ ******************************************************************************/
+
 package be.ppareit.nanopond;
 
 
@@ -13,9 +32,9 @@ import android.widget.TextView;
 
 public class ReportListAdapter extends BaseAdapter {
 
-    Activity activity;
-    NanoPond nanopond;
-    volatile NanoPond.Report report;
+    private Activity activity;
+    private NanoPond nanopond;
+    private volatile NanoPond.Report report;
 
     public ReportListAdapter(Context context, NanoPond np) {
         activity = (Activity) context;
@@ -44,22 +63,22 @@ public class ReportListAdapter extends BaseAdapter {
     @Override
     public Pair<String, Long> getItem(int position) {
         switch (position) {
-        case 0:
-            return new Pair<String, Long>("Year", report.year);
-        case 1:
-            return new Pair<String, Long>("Energy", report.energy);
-        case 2:
-            return new Pair<String, Long>("Max generation", report.maxGeneration);
-        case 3:
-            return new Pair<String, Long>("Active cells", report.activeCells);
-        case 4:
-            return new Pair<String, Long>("Viable replicators", report.viableReplicators);
-        case 5:
-            return new Pair<String, Long>("Kills", report.kills);
-        case 6:
-            return new Pair<String, Long>("Replaced", report.replaced);
-        case 7:
-            return new Pair<String, Long>("Shares", report.shares);
+            case 0:
+                return new Pair<>("Year", report.year);
+            case 1:
+                return new Pair<>("Energy", report.energy);
+            case 2:
+                return new Pair<>("Max generation", report.maxGeneration);
+            case 3:
+                return new Pair<>("Active cells", report.activeCells);
+            case 4:
+                return new Pair<>("Viable replicators", report.viableReplicators);
+            case 5:
+                return new Pair<>("Kills", report.kills);
+            case 6:
+                return new Pair<>("Replaced", report.replaced);
+            case 7:
+                return new Pair<>("Shares", report.shares);
         }
         return null;
     }
@@ -76,8 +95,8 @@ public class ReportListAdapter extends BaseAdapter {
             LayoutInflater li = activity.getLayoutInflater();
             v = li.inflate(R.layout.report_entry, null);
         }
-        TextView keyView = (TextView) v.findViewById(R.id.entry_key);
-        TextView valueView = (TextView) v.findViewById(R.id.entry_value);
+        TextView keyView = v.findViewById(R.id.entry_key);
+        TextView valueView = v.findViewById(R.id.entry_value);
         Pair<String, Long> item = getItem(position);
         keyView.setText(item.first);
         valueView.setText(item.second.toString());

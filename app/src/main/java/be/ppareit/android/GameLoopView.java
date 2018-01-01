@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Pieter Pareit.
+ * Copyright (c) 2011 - 2018 Pieter Pareit.
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +16,7 @@
  * Contributors:
  * Pieter Pareit - initial API and implementation
  ******************************************************************************/
+
 package be.ppareit.android;
 
 import android.annotation.SuppressLint;
@@ -45,7 +46,6 @@ import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
  *
  */
 public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.Callback {
-    private static final String TAG = GameLoopView.class.getSimpleName();
 
     class AnimationThread extends Thread {
 
@@ -72,7 +72,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
         @SuppressLint("WrongCall")
         @Override
         public void run() {
-            Log.d(TAG, "AnimationThread.run'ing");
+            Cat.d("AnimationThread.run'ing");
 
             // block until the surface is completely created in the main thread
             while (!surfaceCreatedCompleted) {
@@ -102,7 +102,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
                 sleepIfNeeded();
                 updateFps();
             }
-            Log.d(TAG, "AnimationThread.run'ed");
+            Cat.d("AnimationThread.run'ed");
         }
 
         private long mNextGameTick = System.currentTimeMillis();
@@ -170,14 +170,14 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
      * call onUpdate() and onDraw().
      */
     public void startGameLoop() {
-        Log.d(TAG, "startGameLoop'ing");
+        Cat.d("startGameLoop'ing");
         // if thread exists, the gameloop is running
         if (mThread == null) {
             mThread = new AnimationThread(getHolder());
             mThread.setRunning(true);
             mThread.start();
         }
-        Log.d(TAG, "startGameLoop'ed");
+        Cat.d("startGameLoop'ed");
     }
 
     /**
@@ -234,7 +234,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if (isInEditMode()) return;
-        Log.d(TAG, "surfaceCreated'ing");
+        Cat.d("surfaceCreated'ing");
         Canvas canvas = null;
         try {
             canvas = holder.lockCanvas();
@@ -245,7 +245,7 @@ public abstract class GameLoopView extends SurfaceView implements SurfaceHolder.
             holder.unlockCanvasAndPost(canvas);
         }
         surfaceCreatedCompleted = true;
-        Log.d(TAG, "surfaceCreated'ed");
+        Cat.d("surfaceCreated'ed");
     }
 
     @Override

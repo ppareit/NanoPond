@@ -27,8 +27,6 @@ import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
 
 public class NanoPond {
 
-    private static final String TAG = NanoPond.class.getSimpleName();
-
     /* All available instructions */
     String[] names = {"ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
             "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP"};

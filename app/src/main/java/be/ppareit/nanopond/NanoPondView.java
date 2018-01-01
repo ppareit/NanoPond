@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Pieter Pareit.
+ * Copyright (c) 2011 - 2018 Pieter Pareit.
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +16,7 @@
  * Contributors:
  *     Pieter Pareit - initial API and implementation
  ******************************************************************************/
+
 package be.ppareit.nanopond;
 
 import android.content.Context;
@@ -34,9 +35,6 @@ import net.vrallev.android.cat.Cat;
 
 import be.ppareit.android.GameLoopView;
 
-/**
- *
- */
 public class NanoPondView extends GameLoopView {
 
     private static final float MIN_SCALE =  1.0f;
