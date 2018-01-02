@@ -40,7 +40,7 @@ public class NanoPondActivity extends Activity {
 
     private View mMainView;
     private NanoPondView mGridView;
-    private View mRapportView;
+    private View mReportView;
     private View mDetailView;
 
     /**
@@ -61,8 +61,8 @@ public class NanoPondActivity extends Activity {
         ReportListAdapter rla = new ReportListAdapter(this, mNanopond);
         propertyList.setAdapter(rla);
 
-        mRapportView = findViewById(R.id.report_view);
-        makeViewFloatable(mRapportView);
+        mReportView = findViewById(R.id.report_view);
+        makeViewFloatable(mReportView);
 
         ListView propertyList2 = findViewById(R.id.detail_property_list);
         DetailListAdapter dla = new DetailListAdapter(this, mGridView, mNanopond);
@@ -85,6 +85,24 @@ public class NanoPondActivity extends Activity {
         int id = item.getItemId();
 
         switch (id) {
+            case R.id.action_show_report:
+                if (mReportView.getVisibility() == View.VISIBLE) {
+                    mReportView.setVisibility(View.INVISIBLE);
+                    item.setChecked(false);
+                } else {
+                    mReportView.setVisibility(View.VISIBLE);
+                    item.setChecked(true);
+                }
+                break;
+            case R.id.action_show_detail:
+                if (mDetailView.getVisibility() == View.VISIBLE) {
+                    mDetailView.setVisibility(View.INVISIBLE);
+                    item.setChecked(false);
+                } else {
+                    mDetailView.setVisibility(View.VISIBLE);
+                    item.setChecked(true);
+                }
+                break;
             case R.id.action_help:
                 try {
                     Resources res = getResources();

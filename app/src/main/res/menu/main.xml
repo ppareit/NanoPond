@@ -2,6 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_show_report"
+        android:orderInCategory="91"
+        android:title="@string/report"
+        android:checkable="true"
+        android:checked="true"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_show_detail"
+        android:orderInCategory="92"
+        android:title="@string/detail"
+        android:checkable="true"
+        android:checked="true"
+        android:showAsAction="never" />
+    <item
         android:id="@+id/action_help"
         android:orderInCategory="101"
         android:title="@string/help_title"
