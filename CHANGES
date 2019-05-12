@@ -1,3 +1,7 @@
+Version 1.2.1 (02/01/2018)
+  * Library update
+  + Make report/detail view hideable
+
 Version 1.2.0 (18/03/2017)
   + Add Run/Stop buttons
   + Add help menu with rules of nanopond
