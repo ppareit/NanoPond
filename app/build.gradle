@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "be.ppareit.nanopond"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 10201
         versionName "1.2.1"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
