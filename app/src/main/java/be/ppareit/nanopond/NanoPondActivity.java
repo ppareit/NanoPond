@@ -3,6 +3,7 @@ package be.ppareit.nanopond;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -130,8 +131,11 @@ public class NanoPondActivity extends Activity {
                 email.putExtra(Intent.EXTRA_SUBJECT, subject);
                 email.putExtra(Intent.EXTRA_TEXT, message);
                 email.setType("message/rfc822");
-                startActivity(email);
-
+                try {
+                    startActivity(email);
+                } catch (ActivityNotFoundException exception) {
+                    Toast.makeText(this, R.string.unable_to_start_mail_client, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.action_about:
                 AlertDialog ad = new AlertDialog.Builder(this)

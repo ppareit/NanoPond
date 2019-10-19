@@ -48,4 +48,5 @@
     <string name="detail">Detail</string>
     <string name="report">Report</string>
     <string name="property">Property</string>
+    <string name="unable_to_start_mail_client">Unable to start the mail client, we are unable to send feedback.</string>
 </resources>
