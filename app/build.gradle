@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -22,6 +24,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'net.vrallev.android:cat:1.0.5'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 android {
@@ -41,4 +44,7 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+}
+repositories {
+    mavenCentral()
 }
