@@ -15,26 +15,20 @@ import android.view.DragEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-
-import net.vrallev.android.cat.Cat
-
-import java.io.IOException
-
-import be.ppareit.nanopond.R.id
-
 import be.ppareit.StringLib.isHexString
 import be.ppareit.android.Utils.openRawTextFile
 import be.ppareit.android.toggleChecked
 import be.ppareit.android.toggleVisibility
+import be.ppareit.nanopond.R.id
 import kotlinx.android.synthetic.main.detail.*
 import kotlinx.android.synthetic.main.main.*
 import kotlinx.android.synthetic.main.report.*
+import net.vrallev.android.cat.Cat
+import java.io.IOException
 
 private const val DIALOG_EDIT_CELL = 0x010
 

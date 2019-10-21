@@ -28,6 +28,10 @@ public class Cell {
     long generation;
     long ID;
     long parentID;
+    /**
+     * Negative value if this was created by seeding a gnome into the world.<p>
+     * Positive if this was created random by running the world.
+     */
     long lineage;
     int energy;
     byte[] genome;
