@@ -128,18 +128,18 @@ class NanoPondActivity : Activity() {
         return super.onOptionsItemSelected(item)
     }
 
-    public override fun onCreateDialog(id: Int): Dialog {
+    public override fun onCreateDialog(id: Int): Dialog? {
         when (id) {
-            DIALOG_EDIT_CELL -> createEditCellDialog()
+            DIALOG_EDIT_CELL -> return createEditCellDialog()
         }
         return super.onCreateDialog(id)
     }
 
-    internal fun createEditCellDialog() {
+    internal fun createEditCellDialog(): Dialog? {
         Cat.d("Creating the edit cell dialog")
         if (!nanoPondView.isCellActive) {
             Toast.makeText(this, R.string.no_cell_active_msg, Toast.LENGTH_LONG).show()
-            return
+            return null
         }
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.editcell)
@@ -164,6 +164,7 @@ class NanoPondActivity : Activity() {
             dialog.dismiss()
         }
         dialog.show()
+        return dialog
     }
 
     /**
