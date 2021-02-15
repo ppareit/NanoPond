@@ -81,7 +81,7 @@ public class NanoPond {
     }
 
     /* The pond is a 2D array of cells */
-    Cell[][] pond = new Cell[POND_SIZE_X][POND_SIZE_Y];
+    public  Cell[][] pond = new Cell[POND_SIZE_X][POND_SIZE_Y];
     private static MTRandom rg = new MTRandom();
 
     /**

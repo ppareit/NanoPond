@@ -17,7 +17,7 @@
  * Pieter Pareit - initial API and implementation
  */
 
-package be.ppareit.nanopond
+package be.ppareit.nanopond.gui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -31,6 +31,8 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.WindowManager
 import be.ppareit.android.GameLoopView
+import be.ppareit.nanopond.Cell
+import be.ppareit.nanopond.NanoPond
 import net.vrallev.android.cat.Cat
 import kotlin.math.abs
 
@@ -38,7 +40,7 @@ import kotlin.math.abs
 private const val MIN_SCALE = 1.0f
 private const val MAX_SCALE = 40.0f
 
-class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context, attrs) {
+public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context, attrs) {
 
     private var state = State.PAUSED
 

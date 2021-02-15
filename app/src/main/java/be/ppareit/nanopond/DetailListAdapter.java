@@ -28,6 +28,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import be.ppareit.nanopond.gui.NanoPondView;
+
 public class DetailListAdapter extends BaseAdapter {
 
     private Activity mActivity;

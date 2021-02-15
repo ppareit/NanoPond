@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <be.ppareit.nanopond.NanoPondView
+    <be.ppareit.nanopond.gui.NanoPondView
         android:id="@+id/nanoPondView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

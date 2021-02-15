@@ -1,4 +1,4 @@
-package be.ppareit.nanopond
+package be.ppareit.nanopond.gui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -23,12 +23,20 @@ import be.ppareit.StringLib.isHexString
 import be.ppareit.android.Utils.openRawTextFile
 import be.ppareit.android.toggleChecked
 import be.ppareit.android.toggleVisibility
+import be.ppareit.nanopond.DetailListAdapter
+import be.ppareit.nanopond.NanoPond
+import be.ppareit.nanopond.R
 import be.ppareit.nanopond.R.id
+import be.ppareit.nanopond.ReportListAdapter
 import kotlinx.android.synthetic.main.detail.*
 import kotlinx.android.synthetic.main.main.*
 import kotlinx.android.synthetic.main.report.*
 import net.vrallev.android.cat.Cat
 import java.io.IOException
+
+import be.ppareit.nanopond.ReportListAdapter.*
+import be.ppareit.nanopond.DetailListAdapter.*
+import be.ppareit.nanopond.gui.NanoPondView.*
 
 private const val DIALOG_EDIT_CELL = 0x010
 
@@ -50,7 +58,7 @@ class NanoPondActivity : Activity() {
         reportPropertyList.adapter = rla
         makeViewFloatable(reportView)
 
-        val dla = DetailListAdapter(this, nanoPondView, nanoPond)
+        val dla = DetailListAdapter(this, nanoPondView as NanoPondView, nanoPond)
         detailPropertyList.adapter = dla
         makeViewFloatable(detailView)
 
