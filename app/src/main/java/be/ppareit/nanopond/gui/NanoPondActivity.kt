@@ -34,10 +34,6 @@ import kotlinx.android.synthetic.main.report.*
 import net.vrallev.android.cat.Cat
 import java.io.IOException
 
-import be.ppareit.nanopond.ReportListAdapter.*
-import be.ppareit.nanopond.DetailListAdapter.*
-import be.ppareit.nanopond.gui.NanoPondView.*
-
 private const val DIALOG_EDIT_CELL = 0x010
 
 class NanoPondActivity : Activity() {
