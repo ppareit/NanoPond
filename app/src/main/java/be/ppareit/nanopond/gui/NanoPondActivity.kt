@@ -20,7 +20,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import be.ppareit.StringLib.isHexString
-import be.ppareit.android.Utils.openRawTextFile
+import be.ppareit.android.openRawTextFile
 import be.ppareit.android.toggleChecked
 import be.ppareit.android.toggleVisibility
 import be.ppareit.nanopond.DetailListAdapter
@@ -83,7 +83,7 @@ class NanoPondActivity : Activity() {
             }
             id.action_help -> try {
                 val res = resources
-                val message = openRawTextFile(res, R.raw.help)
+                val message = res.openRawTextFile(R.raw.help)
                 val webView = WebView(this)
                 webView.loadDataWithBaseURL(null, message.toString(),
                         "text/html", "utf-8", null)
