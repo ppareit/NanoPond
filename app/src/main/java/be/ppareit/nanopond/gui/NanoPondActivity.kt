@@ -17,8 +17,11 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
 import android.widget.Button
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import be.ppareit.StringLib.isHexString
 import be.ppareit.android.openRawTextFile
 import be.ppareit.android.toggleChecked
@@ -28,22 +31,26 @@ import be.ppareit.nanopond.NanoPond
 import be.ppareit.nanopond.R
 import be.ppareit.nanopond.R.id
 import be.ppareit.nanopond.ReportListAdapter
-import kotlinx.android.synthetic.main.detail.*
-import kotlinx.android.synthetic.main.main.*
-import kotlinx.android.synthetic.main.report.*
 import net.vrallev.android.cat.Cat
 import java.io.IOException
 
 private const val DIALOG_EDIT_CELL = 0x010
 
-class NanoPondActivity : Activity() {
+class NanoPondActivity : AppCompatActivity() {
 
     val nanoPond: NanoPond = NanoPond()
 
-    /**
-     * Called when the activity is first created.
-     */
+    private val mainView: View by lazy { findViewById(R.id.mainView) }
+    private val nanoPondView: NanoPondView by lazy { findViewById(R.id.nanoPondView) }
+    private val reportView: View by lazy { findViewById(R.id.reportView) }
+    private val detailView: View by lazy { findViewById(R.id.detailView) }
+
+    private val reportPropertyList: ListView by lazy { findViewById(R.id.reportPropertyList) }
+    private val detailPropertyList: ListView by lazy { findViewById(R.id.detailPropertyList) }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
+
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 
         nanoPond.run()
@@ -54,15 +61,14 @@ class NanoPondActivity : Activity() {
         reportPropertyList.adapter = rla
         makeViewFloatable(reportView)
 
-        val dla = DetailListAdapter(this, nanoPondView as NanoPondView, nanoPond)
+        val dla = DetailListAdapter(this, nanoPondView, nanoPond)
         detailPropertyList.adapter = dla
         makeViewFloatable(detailView)
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.main, menu)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
@@ -73,25 +79,30 @@ class NanoPondActivity : Activity() {
                 reportView.toggleVisibility()
                 item.toggleChecked()
             }
+
             id.action_show_detail -> {
                 detailView.toggleVisibility()
                 item.toggleChecked()
             }
+
             id.action_help -> try {
                 val res = resources
                 val message = res.openRawTextFile(R.raw.help)
                 val webView = WebView(this)
-                webView.loadDataWithBaseURL(null, message.toString(),
-                        "text/html", "utf-8", null)
+                webView.loadDataWithBaseURL(
+                    null, message.toString(),
+                    "text/html", "utf-8", null
+                )
                 val alertDialog = AlertDialog.Builder(this)
-                        .setTitle(R.string.help_title)
-                        .setView(webView)
-                        .setPositiveButton(getText(android.R.string.ok), null)
-                        .create()
+                    .setTitle(R.string.help_title)
+                    .setView(webView)
+                    .setPositiveButton(getText(android.R.string.ok), null)
+                    .create()
                 alertDialog.show()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+
             id.action_feedback -> {
                 val to = "pieter.pareit@gmail.com"
                 val subject = "Nanopond feedback"
@@ -105,28 +116,35 @@ class NanoPondActivity : Activity() {
                 try {
                     startActivity(email)
                 } catch (exception: ActivityNotFoundException) {
-                    Toast.makeText(this, R.string.unable_to_start_mail_client, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, R.string.unable_to_start_mail_client, Toast.LENGTH_LONG)
+                        .show()
                 }
 
             }
+
             id.action_about -> {
                 val ad = AlertDialog.Builder(this)
-                        .setTitle(R.string.about_dlg_title)
-                        .setMessage(R.string.about_dlg_message)
-                        .setPositiveButton(getText(android.R.string.ok), null)
-                        .create()
+                    .setTitle(R.string.about_dlg_title)
+                    .setMessage(R.string.about_dlg_message)
+                    .setPositiveButton(getText(android.R.string.ok), null)
+                    .create()
                 ad.show()
-                Linkify.addLinks(ad.findViewById<View>(android.R.id.message) as TextView,
-                        Linkify.ALL)
+                Linkify.addLinks(
+                    ad.findViewById<View>(android.R.id.message) as TextView,
+                    Linkify.ALL
+                )
             }
+
             id.action_run -> {
                 nanoPondView.setMode(NanoPondView.State.RUNNING)
                 nanoPond.run()
             }
+
             id.action_pause -> {
                 nanoPondView.setMode(NanoPondView.State.PAUSED)
                 nanoPond.pauze()
             }
+
             id.action_editcell -> showDialog(DIALOG_EDIT_CELL)
         }
         return super.onOptionsItemSelected(item)
@@ -200,6 +218,7 @@ class NanoPondActivity : Activity() {
                     // messages
                     true
                 }
+
                 DragEvent.ACTION_DRAG_ENDED -> {
                     Cat.v("onDrag : ACTION_DRAG_ENDED")
                     // the child view is put in the localstate
@@ -208,6 +227,7 @@ class NanoPondActivity : Activity() {
                     cv.visibility = View.VISIBLE
                     true
                 }
+
                 DragEvent.ACTION_DROP -> {
                     Cat.v("onDrag : ACTION_DROP")
                     // the child view is put in the localstate
@@ -221,6 +241,7 @@ class NanoPondActivity : Activity() {
                     cv.translationY = dy
                     true
                 }
+
                 else -> false
             }
         }

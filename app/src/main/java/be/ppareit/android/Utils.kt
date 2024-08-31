@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.view.MenuItem
 import android.view.View
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 
 fun View.toggleVisibility() {
@@ -26,4 +25,11 @@ fun Resources.openRawTextFile(id: Int): CharSequence {
         }
     }
     return result
+}
+
+fun sleepIgnoreInterrupt(millis: Long) {
+    try {
+        Thread.sleep(millis)
+    } catch (ignored: InterruptedException) {
+    }
 }

@@ -19,9 +19,9 @@
 
 package be.ppareit.nanopond;
 
-import net.vrallev.android.cat.Cat;
-
 import static be.ppareit.nanopond.NanoPond.POND_DEPTH;
+
+import net.vrallev.android.cat.Cat;
 
 public class Cell {
 

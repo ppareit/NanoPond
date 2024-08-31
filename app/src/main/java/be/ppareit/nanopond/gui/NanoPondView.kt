@@ -106,8 +106,10 @@ public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(
     }
 
     private inner class MoveListener : GestureDetector.SimpleOnGestureListener() {
-        override fun onScroll(e1: MotionEvent, e2: MotionEvent,
-                              distanceX: Float, distanceY: Float): Boolean {
+        override fun onScroll(
+            e1: MotionEvent?, e2: MotionEvent,
+            distanceX: Float, distanceY: Float
+        ): Boolean {
             drawMatrix.postTranslate(-distanceX, -distanceY)
             return true
         }
@@ -223,7 +225,7 @@ public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(
 
         Cat.d("size changed")
 
-        drawMatrix.postTranslate(-NanoPond.POND_SIZE_X / 2f,-NanoPond.POND_SIZE_Y / 2f)
+        drawMatrix.postTranslate(-NanoPond.POND_SIZE_X / 2f, -NanoPond.POND_SIZE_Y / 2f)
 
         // scale to display metrics
         val metrics = DisplayMetrics()
@@ -239,7 +241,8 @@ public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(
     }
 
     companion object {
-        internal var artificial = intArrayOf(Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW, Color.RED, Color.MAGENTA)
+        internal var artificial =
+            intArrayOf(Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW, Color.RED, Color.MAGENTA)
 
         internal fun cap(i: Int): Int {
             return if (i > 255)
