@@ -1,3 +1,13 @@
+Version 3.0.0 (26/12/2024)
+  * Move project to Kotlin
+  * Updated libraries
+
+Version 2.1.0 (31/12/2020)
+  * Improvements in help
+
+Version 2.0.0 (19/09/2020)
+  * Initial port to newer android API's
+
 Version 1.2.1 (02/01/2018)
   * Library update
   + Make report/detail view hideable

@@ -23,7 +23,7 @@
  */
 package be.ppareit.nanopond;
 
-import static be.ppareit.android.Utils.sleepIgnoreInterrupt;
+import static java.lang.Thread.sleep;
 
 public class NanoPond {
 
@@ -81,7 +81,7 @@ public class NanoPond {
     }
 
     /* The pond is a 2D array of cells */
-    Cell[][] pond = new Cell[POND_SIZE_X][POND_SIZE_Y];
+    public  Cell[][] pond = new Cell[POND_SIZE_X][POND_SIZE_Y];
     private static MTRandom rg = new MTRandom();
 
     /**
@@ -236,7 +236,11 @@ public class NanoPond {
                 int threadCounter = 0;
                 while (isRunning) {
                     if (threadCounter % 1013 == 0) {
-                        sleepIgnoreInterrupt(1);
+                        try {
+                            sleep(1);
+                        } catch (InterruptedException e) {
+                            // ignore
+                        }
                     }
                     singleStep();
                     ++threadCounter;

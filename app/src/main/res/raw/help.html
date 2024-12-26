@@ -16,16 +16,14 @@
 
         <h1>How Nanopond works:</h1>
 
-        The Nanopond world is called a<em>pond</em>. It is an NxM two dimensional
-        array of
-        <em>cell</em>
-        structures, and it wraps at the edges (it's toroidal).
+        The Nanopond world is called a <em>pond</em>. It is an NxM two dimensional
+        array of <em>cell</em> structures, and it wraps at the edges (it's toroidal).
         Each cell has an energy, a genome ( that is an array of POND_DEPTH four-bit
         values), an id and a parent id. Dead cell's have an id of zero.
         <p />
 
 
-        The first four bit value in the genome is called the<em>logo</em>. What that is
+        The first four bit value in the genome is called the <em>logo</em>. What that is
         for will be explained later. The remaining four bit values each code for
         one of 16 instructions:
 
@@ -140,7 +138,7 @@
         What results from this simple set of rules is an evolutionary game of
         <em>corewar</em>. In the beginning, the process of randomly generating cells
         will cause self-replicating viable cells to spontaneously emerge. This
-        is something I call<em>random genesis</em>, and happens when some of the
+        is something I call <em>random genesis</em>, and happens when some of the
         random gak turns out to be a program able to copy itself. After this,
         evolution by natural selection takes over. Since natural selection is
         most certainly not random, things will start to get more and more

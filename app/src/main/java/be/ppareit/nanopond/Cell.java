@@ -19,18 +19,22 @@
 
 package be.ppareit.nanopond;
 
-import net.vrallev.android.cat.Cat;
-
 import static be.ppareit.nanopond.NanoPond.POND_DEPTH;
+
+import net.vrallev.android.cat.Cat;
 
 public class Cell {
 
-    long generation;
-    long ID;
-    long parentID;
-    long lineage;
-    int energy;
-    byte[] genome;
+    public long generation;
+    public long ID;
+    public long parentID;
+    /**
+     * Negative value if this was created by seeding a gnome into the world.<p>
+     * Positive if this was created random by running the world.
+     */
+    public long lineage;
+    public int energy;
+    public byte[] genome;
 
     private final static MTRandom rg = new MTRandom();
     private final static byte[] startBuffer = new byte[POND_DEPTH];

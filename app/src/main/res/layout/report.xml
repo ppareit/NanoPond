@@ -12,7 +12,7 @@
         android:background="#FFF" />
 
     <ListView
-        android:id="@+id/report_property_list"
+        android:id="@+id/reportPropertyList"
         android:layout_width="225dp"
         android:layout_height="wrap_content" />
 

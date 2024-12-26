@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
+    android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <be.ppareit.nanopond.NanoPondView
-        android:id="@+id/nanopond_view"
+    <be.ppareit.nanopond.gui.NanoPondView
+        android:id="@+id/nanoPondView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <include
         layout="@layout/report"
-        android:id="@+id/report_view"
+        android:id="@+id/reportView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -20,7 +20,7 @@
 
     <include
         layout="@layout/detail"
-        android:id="@+id/detail_view"
+        android:id="@+id/detailView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
