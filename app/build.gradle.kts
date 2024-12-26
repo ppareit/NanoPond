@@ -10,9 +10,9 @@ android {
     defaultConfig {
         applicationId = "be.ppareit.nanopond"
         minSdk = 26
-        //targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 30001
+        versionName = "3.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
