@@ -1,6 +1,5 @@
 package be.ppareit.nanopond.gui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ActivityNotFoundException
@@ -21,8 +20,6 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import be.ppareit.StringLib.isHexString
 import be.ppareit.android.openRawTextFile
 import be.ppareit.android.toggleChecked
 import be.ppareit.android.toggleVisibility
@@ -31,6 +28,7 @@ import be.ppareit.nanopond.NanoPond
 import be.ppareit.nanopond.R
 import be.ppareit.nanopond.R.id
 import be.ppareit.nanopond.ReportListAdapter
+import be.ppareit.nanopond.utils.isHex
 import net.vrallev.android.cat.Cat
 import java.io.IOException
 
@@ -174,7 +172,7 @@ class NanoPondActivity : AppCompatActivity() {
         hexaText.text = activeCell.hexa
         hexaText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                okButton.isEnabled = s.length > NanoPond.POND_DEPTH && isHexString(s.toString())
+                okButton.isEnabled = s.length > NanoPond.POND_DEPTH && s.isHex()
             }
 
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
