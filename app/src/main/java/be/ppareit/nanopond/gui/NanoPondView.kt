@@ -40,7 +40,7 @@ import kotlin.math.abs
 private const val MIN_SCALE = 1.0f
 private const val MAX_SCALE = 40.0f
 
-public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context, attrs) {
+class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context, attrs) {
 
     private var state = State.PAUSED
 
@@ -50,12 +50,6 @@ public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(
     private val backgroundPaint = Paint().apply { color = Color.BLACK }
     private val cellPaint = Paint()
     private val activeCellPaint = Paint().apply { color = Color.CYAN }
-
-    // Useful paint to display debugging info on screen
-    private val debugPaint = Paint().apply {
-        setARGB(255, 255, 240, 0)
-        textSize = 32f
-    }
 
     private val moveDetector = GestureDetector(context, MoveListener())
     private val scaleDetector = ScaleGestureDetector(context, ScaleListener())
@@ -241,28 +235,26 @@ public class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(
     }
 
     companion object {
-        internal var artificial =
-            intArrayOf(Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW, Color.RED, Color.MAGENTA)
+        private val artificial = intArrayOf(
+            Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW, Color.RED, Color.MAGENTA
+        )
 
-        internal fun cap(i: Int): Int {
-            return if (i > 255)
-                255
-            else if (i < 0)
-                0
-            else
-                i
+        private fun cap(i: Int): Int {
+            return i.coerceIn(0, 255)
         }
 
         internal fun getColor(cell: Cell): Int {
-            if (cell.lineage < 0)
-                return artificial[abs(cell.lineage).toInt() % artificial.size]
+            if (cell.lineage < 0){
+                val index = abs(cell.lineage).toInt() % artificial.size
+                return artificial[index]
+            }
 
             val lsp = cell.lineage.toInt()
             val alpha = 0xff
-            val red = lsp % 256
-            val green = lsp % (256 * 256) / 256
-            val blue = lsp % (256 * 256 * 256) / 256 / 256
-            return alpha shl 24 or (cap(red) shl 16) or (cap(green) shl 8) or cap(blue)
+            val red = cap(lsp % 256)
+            val green = cap(lsp % (256 * 256) / 256)
+            val blue = cap(lsp % (256 * 256 * 256) / 256 / 256)
+            return Color.argb(alpha, red, green, blue)
         }
     }
 }
