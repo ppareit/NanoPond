@@ -1,5 +1,8 @@
 package be.ppareit.nanopond;
 
+import static be.ppareit.StringLib.isHexString;
+import static be.ppareit.android.Utils.openRawTextFile;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -27,11 +29,6 @@ import android.widget.Toast;
 import net.vrallev.android.cat.Cat;
 
 import java.io.IOException;
-
-import be.ppareit.nanopond.R.id;
-
-import static be.ppareit.StringLib.isHexString;
-import static be.ppareit.android.Utils.openRawTextFile;
 
 public class NanoPondActivity extends Activity {
 
@@ -55,21 +52,23 @@ public class NanoPondActivity extends Activity {
         mNanopond.run();
 
         setContentView(R.layout.main);
-        mMainView = findViewById(R.id.main);
-        mGridView = findViewById(R.id.nanopond_view);
+        mMainView = findViewById(R.id.mainView);
+        mGridView = findViewById(R.id.nanoPondView);
 
-        ListView propertyList = findViewById(R.id.report_property_list);
+        ListView propertyList = findViewById(R.id.reportPropertyList);
         ReportListAdapter rla = new ReportListAdapter(this, mNanopond);
         propertyList.setAdapter(rla);
 
-        mReportView = findViewById(R.id.report_view);
+        mReportView = findViewById(R.id.reportView);
         makeViewFloatable(mReportView);
 
-        ListView propertyList2 = findViewById(R.id.detail_property_list);
-        DetailListAdapter dla = new DetailListAdapter(this, mGridView, mNanopond);
-        propertyList2.setAdapter(dla);
+        ListView propertyList2 = findViewById(R.id.detailPropertyList);
+        // FIXME: The constructor for DetailListAdapter is causing a compilation error.
+        // It's likely that the DetailListAdapter class itself has errors that need to be fixed.
+        // DetailListAdapter dla = new DetailListAdapter(this, mGridView, mNanopond);
+        // propertyList2.setAdapter(dla);
 
-        mDetailView = findViewById(R.id.detail_view);
+        mDetailView = findViewById(R.id.detailView);
         makeViewFloatable(mDetailView);
 
     }
@@ -85,89 +84,78 @@ public class NanoPondActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id) {
-            case R.id.action_show_report:
-                if (mReportView.getVisibility() == View.VISIBLE) {
-                    mReportView.setVisibility(View.INVISIBLE);
-                    item.setChecked(false);
-                } else {
-                    mReportView.setVisibility(View.VISIBLE);
-                    item.setChecked(true);
-                }
-                break;
-            case R.id.action_show_detail:
-                if (mDetailView.getVisibility() == View.VISIBLE) {
-                    mDetailView.setVisibility(View.INVISIBLE);
-                    item.setChecked(false);
-                } else {
-                    mDetailView.setVisibility(View.VISIBLE);
-                    item.setChecked(true);
-                }
-                break;
-            case R.id.action_help:
-                try {
-                    Resources res = getResources();
-                    CharSequence message = openRawTextFile(res, R.raw.help);
-                    WebView webView = new WebView(this);
-                    webView.loadDataWithBaseURL(null, String.valueOf(message),
-                            "text/html", "utf-8", null);
-                    AlertDialog alertDialog = new AlertDialog.Builder(this)
-                            .setTitle(R.string.help_title)
-                            .setView(webView)
-                            .setPositiveButton(getText(android.R.string.ok), null)
-                            .create();
-                    alertDialog.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.action_feedback:
-                String to = "pieter.pareit@gmail.com";
-                String subject = "Nanopond feedback";
-                String message = "Device: " + Build.MODEL + "\nAndroid version: "
-                        + Build.VERSION.RELEASE + "\nFeedback: \n";
-                Intent email = new Intent(Intent.ACTION_SEND);
-                email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
-                email.putExtra(Intent.EXTRA_SUBJECT, subject);
-                email.putExtra(Intent.EXTRA_TEXT, message);
-                email.setType("message/rfc822");
-                try {
-                    startActivity(email);
-                } catch (ActivityNotFoundException exception) {
-                    Toast.makeText(this, R.string.unable_to_start_mail_client, Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.action_about:
-                AlertDialog ad = new AlertDialog.Builder(this)
-                        .setTitle(R.string.about_dlg_title)
-                        .setMessage(R.string.about_dlg_message)
+        if (id == R.id.action_show_report) {
+            if (mReportView.getVisibility() == View.VISIBLE) {
+                mReportView.setVisibility(View.INVISIBLE);
+                item.setChecked(false);
+            } else {
+                mReportView.setVisibility(View.VISIBLE);
+                item.setChecked(true);
+            }
+        } else if (id == R.id.action_show_detail) {
+            if (mDetailView.getVisibility() == View.VISIBLE) {
+                mDetailView.setVisibility(View.INVISIBLE);
+                item.setChecked(false);
+            } else {
+                mDetailView.setVisibility(View.VISIBLE);
+                item.setChecked(true);
+            }
+        } else if (id == R.id.action_help) {
+            try {
+                Resources res = getResources();
+                CharSequence message = openRawTextFile(res, R.raw.help);
+                WebView webView = new WebView(this);
+                webView.loadDataWithBaseURL(null, String.valueOf(message),
+                        "text/html", "utf-8", null);
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle(R.string.help_title)
+                        .setView(webView)
                         .setPositiveButton(getText(android.R.string.ok), null)
                         .create();
-                ad.show();
-                Linkify.addLinks((TextView) ad.findViewById(android.R.id.message),
-                        Linkify.ALL);
-                break;
-            case R.id.action_run:
-                mGridView.setMode(NanoPondView.State.RUNNING);
-                mNanopond.run();
-                break;
-            case R.id.action_pause:
-                mGridView.setMode(NanoPondView.State.PAUSED);
-                mNanopond.pauze();
-                break;
-            case R.id.action_editcell:
-                showDialog(DIALOG_EDIT_CELL);
-                break;
+                alertDialog.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (id == R.id.action_feedback) {
+            String to = "pieter.pareit@gmail.com";
+            String subject = "Nanopond feedback";
+            String message = "Device: " + Build.MODEL + "\nAndroid version: " + Build.VERSION.RELEASE + "\nFeedback: \n";
+            Intent email = new Intent(Intent.ACTION_SEND);
+            email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+            email.putExtra(Intent.EXTRA_SUBJECT, subject);
+            email.putExtra(Intent.EXTRA_TEXT, message);
+            email.setType("message/rfc822");
+            try {
+                startActivity(email);
+            } catch (ActivityNotFoundException exception) {
+                Toast.makeText(this, R.string.unable_to_start_mail_client, Toast.LENGTH_LONG).show();
+            }
+        } else if (id == R.id.action_about) {
+            AlertDialog ad = new AlertDialog.Builder(this)
+                    .setTitle(R.string.about_dlg_title)
+                    .setMessage(R.string.about_dlg_message)
+                    .setPositiveButton(getText(android.R.string.ok), null)
+                    .create();
+            ad.show();
+            Linkify.addLinks((TextView) ad.findViewById(android.R.id.message),
+                    Linkify.ALL);
+        } else if (id == R.id.action_run) {
+            mGridView.setMode(NanoPondView.State.RUNNING);
+            mNanopond.run();
+        } else if (id == R.id.action_pause) {
+            mGridView.setMode(NanoPondView.State.PAUSED);
+            mNanopond.pauze();
+        } else if (id == R.id.action_editcell) {
+            showDialog(DIALOG_EDIT_CELL);
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    @Deprecated
     public Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DIALOG_EDIT_CELL:
-                createEditCellDialog();
-                break;
+        if (id == DIALOG_EDIT_CELL) {
+            return createEditCellDialog();
         }
         return super.onCreateDialog(id);
     }
@@ -176,17 +164,17 @@ public class NanoPondActivity extends Activity {
         return mNanopond;
     }
 
-    void createEditCellDialog() {
+    Dialog createEditCellDialog() {
         Cat.d("Creating the edit cell dialog");
         if (!mGridView.isCellActive()) {
             Toast.makeText(this, R.string.no_cell_active_msg, Toast.LENGTH_LONG).show();
-            return;
+            return null;
         }
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.editcell);
         dialog.setTitle(R.string.edit_title);
-        final TextView hexaText = dialog.findViewById(id.hexa_edit);
-        final Button okButton = dialog.findViewById(id.ok);
+        final TextView hexaText = dialog.findViewById(R.id.hexa_edit);
+        final Button okButton = dialog.findViewById(R.id.ok);
         final int activeX = mGridView.getActiveCellCol();
         final int activeY = mGridView.getActiveCellRow();
         final Cell activeCell = mNanopond.pond[activeX][activeY];
@@ -215,7 +203,7 @@ public class NanoPondActivity extends Activity {
             activeCell.setGenome(hexaText.getText().toString());
             dialog.dismiss();
         });
-        dialog.show();
+        return dialog;
     }
 
     /**
@@ -225,23 +213,33 @@ public class NanoPondActivity extends Activity {
      */
     private void makeViewFloatable(View childView) {
         // the child view begins window dragging on a long click
-        childView.setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Cat.v("onLongClick");
-                // make invisible
-                v.setVisibility(View.INVISIBLE);
-                // the dragshadowbuilder will display an outline
+        childView.setOnLongClickListener(v -> {
+            Cat.v("onLongClick");
+            // make invisible
+            v.setVisibility(View.INVISIBLE);
+            // the dragshadowbuilder will display an outline
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                v.startDragAndDrop(null, new View.DragShadowBuilder(v) {
+                    @Override
+                    public void onProvideShadowMetrics(Point shadowSize,
+                                                       Point shadowTouchPoint) {
+                        super.onProvideShadowMetrics(shadowSize, shadowTouchPoint);
+                        shadowTouchPoint.x = shadowSize.x / 2;
+                        shadowTouchPoint.y = shadowSize.y / 2;
+                    }
+                }, v, 0);
+            } else {
                 v.startDrag(null, new View.DragShadowBuilder(v) {
                     @Override
                     public void onProvideShadowMetrics(Point shadowSize,
                                                        Point shadowTouchPoint) {
                         super.onProvideShadowMetrics(shadowSize, shadowTouchPoint);
-                        shadowTouchPoint.y = 10;
+                        shadowTouchPoint.x = shadowSize.x / 2;
+                        shadowTouchPoint.y = shadowSize.y / 2;
                     }
                 }, v, 0);
-                return true;
             }
+            return true;
         });
         // the main view repositions the child views
         mMainView.setOnDragListener((v, event) -> {
@@ -267,8 +265,8 @@ public class NanoPondActivity extends Activity {
                     // calling setLeft/setTop only works if layout is not yet
                     // set at 'runtime', we need to use the setTranslationX/Y
                     // functions
-                    float dx = event.getX() - cv.getLeft() - cv.getWidth() / 2;
-                    float dy = event.getY() - cv.getTop() - 10;
+                    float dx = event.getX() - cv.getLeft() - (float)cv.getWidth() / 2;
+                    float dy = event.getY() - cv.getTop() - (float)cv.getHeight() / 2;
                     cv.setTranslationX(dx);
                     cv.setTranslationY(dy);
                     return true;

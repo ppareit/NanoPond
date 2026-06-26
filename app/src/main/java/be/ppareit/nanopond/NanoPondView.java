@@ -40,6 +40,11 @@ public class NanoPondView extends GameLoopView {
     private static final float MIN_SCALE =  1.0f;
     private static final float MAX_SCALE = 40.0f;
 
+    @Override
+    public void onUpdate() {
+
+    }
+
     public enum State {
         RUNNING, PAUSED,
     }
@@ -113,11 +118,6 @@ public class NanoPondView extends GameLoopView {
         if (mActiveCellRow == -1)
             throw new IllegalStateException("No cell active");
         return mActiveCellRow;
-    }
-
-    @Override
-    protected void onUpdate() {
-        // the nanopond object runs in its own thread thus that is updated continuously
     }
 
     private class MoveListener extends GestureDetector.SimpleOnGestureListener {
