@@ -34,6 +34,8 @@ import be.ppareit.nanopond.gui.NanoPondView;
 
 public class DetailListAdapter extends BaseAdapter {
 
+    static final int ROW_COUNT = 9;
+
     private Activity mActivity;
     private NanoPondView mView;
     private NanoPond mNanopond;
@@ -71,7 +73,7 @@ public class DetailListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 8;
+        return ROW_COUNT;
     }
 
     @Override
@@ -80,25 +82,50 @@ public class DetailListAdapter extends BaseAdapter {
             return null;
         switch (position) {
         case 0:
-            return new Pair<>("Lineage", String.valueOf(mActiveCell.lineage));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveCell.lineage));
         case 1:
-            return new Pair<>("Energy", String.valueOf(mActiveCell.energy));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveCell.energy));
         case 2:
-            return new Pair<>("X", String.valueOf(mActiveX));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveX));
         case 3:
-            return new Pair<>("Y", String.valueOf(mActiveY));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveY));
         case 4:
-            return new Pair<>("ID", String.valueOf(mActiveCell.ID));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveCell.ID));
         case 5:
-            return new Pair<>("ParentID", String.valueOf(mActiveCell.parentID));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveCell.parentID));
         case 6:
-            return new Pair<>("Generation", String.valueOf(mActiveCell.generation));
+            return new Pair<>(getLabel(position), String.valueOf(mActiveCell.generation));
         case 7:
-            return new Pair<>("Hexa", hexa(mActiveCell.genome));
+            return new Pair<>(getLabel(position), hexa(mActiveCell.genome));
         case 8:
-            return new Pair<>("Disassemble", disassemble(mActiveCell.genome, mNanopond));
+            return new Pair<>(getLabel(position), disassemble(mActiveCell.genome, mNanopond));
         }
         return null;
+    }
+
+    static String getLabel(int position) {
+        switch (position) {
+        case 0:
+            return "Lineage";
+        case 1:
+            return "Energy";
+        case 2:
+            return "X";
+        case 3:
+            return "Y";
+        case 4:
+            return "ID";
+        case 5:
+            return "ParentID";
+        case 6:
+            return "Generation";
+        case 7:
+            return "Hexa";
+        case 8:
+            return "Disassemble";
+        default:
+            return null;
+        }
     }
 
     @Override
@@ -139,8 +166,6 @@ public class DetailListAdapter extends BaseAdapter {
         return out.toString();
     }
 }
-
-
 
 
 

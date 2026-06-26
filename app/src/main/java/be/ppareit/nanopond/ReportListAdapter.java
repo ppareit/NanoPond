@@ -34,6 +34,8 @@ import be.ppareit.nanopond.core.NanoPond;
 
 public class ReportListAdapter extends BaseAdapter {
 
+    static final int ROW_COUNT = 8;
+
     private Activity activity;
     private NanoPond nanopond;
     private volatile NanoPond.Report report;
@@ -59,30 +61,53 @@ public class ReportListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 7;
+        return ROW_COUNT;
     }
 
     @Override
     public Pair<String, Long> getItem(int position) {
         switch (position) {
             case 0:
-                return new Pair<>("Year", report.year);
+                return new Pair<>(getLabel(position), report.year);
             case 1:
-                return new Pair<>("Energy", report.energy);
+                return new Pair<>(getLabel(position), report.energy);
             case 2:
-                return new Pair<>("Max generation", report.maxGeneration);
+                return new Pair<>(getLabel(position), report.maxGeneration);
             case 3:
-                return new Pair<>("Active cells", report.activeCells);
+                return new Pair<>(getLabel(position), report.activeCells);
             case 4:
-                return new Pair<>("Viable replicators", report.viableReplicators);
+                return new Pair<>(getLabel(position), report.viableReplicators);
             case 5:
-                return new Pair<>("Kills", report.kills);
+                return new Pair<>(getLabel(position), report.kills);
             case 6:
-                return new Pair<>("Replaced", report.replaced);
+                return new Pair<>(getLabel(position), report.replaced);
             case 7:
-                return new Pair<>("Shares", report.shares);
+                return new Pair<>(getLabel(position), report.shares);
         }
         return null;
+    }
+
+    static String getLabel(int position) {
+        switch (position) {
+            case 0:
+                return "Year";
+            case 1:
+                return "Energy";
+            case 2:
+                return "Max generation";
+            case 3:
+                return "Active cells";
+            case 4:
+                return "Viable replicators";
+            case 5:
+                return "Kills";
+            case 6:
+                return "Replaced";
+            case 7:
+                return "Shares";
+            default:
+                return null;
+        }
     }
 
     @Override

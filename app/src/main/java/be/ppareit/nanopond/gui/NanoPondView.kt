@@ -21,7 +21,6 @@ package be.ppareit.nanopond.gui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.util.AttributeSet
@@ -32,7 +31,6 @@ import be.ppareit.android.GameLoopView
 import be.ppareit.nanopond.core.Cell
 import be.ppareit.nanopond.core.NanoPond
 import net.vrallev.android.cat.Cat
-import kotlin.math.abs
 
 
 private const val MIN_SCALE = 1.0f
@@ -52,33 +50,34 @@ class NanoPondView(
 
     private var state = State.PAUSED
 
-    private val canvasPaint = Paint().apply { color = Color.GRAY }
-    private val backgroundPaint = Paint().apply { color = Color.BLACK }
+    private val canvasPaint = Paint().apply { color = 0xff888888.toInt() }
+    private val backgroundPaint = Paint().apply { color = 0xff000000.toInt() }
     private val cellPaint = Paint()
-    private val activeCellPaint = Paint().apply { color = Color.CYAN }
+    private val activeCellPaint = Paint().apply { color = 0xff00ffff.toInt() }
 
     private val moveDetector = GestureDetector(context, MoveListener())
     private val scaleDetector = ScaleGestureDetector(context, ScaleListener())
 
     private val drawMatrix = Matrix()
 
+    private var selectedCellRow = -1
+    private var selectedCellCol = -1
+
     // keep track of the active cell
-    var activeCellRow = 0
+    val activeCellRow: Int
         get() {
-            check(field != -1) { "No cell active" }
-            return field
+            check(selectedCellRow != -1) { "No cell active" }
+            return selectedCellRow
         }
-        private set
 
     val isCellActive: Boolean
-        get() = activeCellCol != -1
+        get() = selectedCellCol != -1
 
-    var activeCellCol: Int = 0
+    val activeCellCol: Int
         get() {
-            check(field != -1) { "No cell active" }
-            return field
+            check(selectedCellCol != -1) { "No cell active" }
+            return selectedCellCol
         }
-        private set
 
     private val scale: Float
         get() = drawMatrix.mapRadius(1f)
@@ -124,8 +123,8 @@ class NanoPondView(
             Cat.d("Tapped: $c  $r")
 
             if (c in 0 until NanoPond.POND_SIZE_X && r in 0 until NanoPond.POND_SIZE_Y) {
-                activeCellCol = c
-                activeCellRow = r
+                selectedCellCol = c
+                selectedCellRow = r
             }
             return true
         }
@@ -197,17 +196,17 @@ class NanoPondView(
         }
 
         // draw the active cell
-        if (activeCellCol != -1) {
-            var left = activeCellCol * size
-            var top = activeCellRow * size
-            var right = activeCellCol * size + size
-            var bottom = activeCellRow * size + size
+        if (selectedCellCol != -1) {
+            var left = selectedCellCol * size
+            var top = selectedCellRow * size
+            var right = selectedCellCol * size + size
+            var bottom = selectedCellRow * size + size
             canvas.drawRect(left, top, right, bottom, activeCellPaint)
             left += size / 8
             top += size / 8
             right -= size / 8
             bottom -= size / 8
-            val cell = pond[activeCellCol][activeCellRow]
+            val cell = pond[selectedCellCol][selectedCellRow]
             if (cell.generation > 2 && cell.energy > 0) {
                 cellPaint.color = getColor(cell)
                 canvas.drawRect(left, top, right, bottom, cellPaint)
@@ -237,32 +236,11 @@ class NanoPondView(
     }
 
     companion object {
-        private val artificial = intArrayOf(
-            Color.WHITE, Color.GREEN, Color.CYAN, Color.YELLOW, Color.RED, Color.MAGENTA
-        )
-
-        private fun cap(i: Int): Int {
-            return i.coerceIn(0, 255)
-        }
-
         internal fun getColor(cell: Cell): Int {
-            if (cell.lineage < 0){
-                val index = abs(cell.lineage).toInt() % artificial.size
-                return artificial[index]
-            }
-
-            val lsp = cell.lineage.toInt()
-            val alpha = 0xff
-            val red = cap(lsp % 256)
-            val green = cap(lsp % (256 * 256) / 256)
-            val blue = cap(lsp % (256 * 256 * 256) / 256 / 256)
-            return Color.argb(alpha, red, green, blue)
+            return NanoPondColors.getColor(cell)
         }
     }
 }
-
-
-
 
 
 

@@ -62,7 +62,7 @@ import be.ppareit.nanopond.DetailListAdapter
 import be.ppareit.nanopond.R
 import be.ppareit.nanopond.ReportListAdapter
 import be.ppareit.nanopond.core.NanoPond
-import be.ppareit.nanopond.utils.isHex
+import be.ppareit.nanopond.core.isValidGenomeHex
 import net.vrallev.android.cat.Cat
 import java.io.IOException
 import kotlin.math.roundToInt
@@ -402,7 +402,7 @@ class NanoPondActivity : ComponentActivity() {
         hexaText.text = activeCell.hexa
         hexaText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                okButton.isEnabled = s.length > NanoPond.POND_DEPTH && s.isHex()
+                okButton.isEnabled = isValidGenomeHex(s)
             }
 
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

@@ -29,8 +29,8 @@ abstract class GameLoopView(context: Context, attrs: AttributeSet? = null) : Sur
 
     @SuppressLint("WrongCall")
     override fun run() {
-        var canvas: Canvas? = null
         while (isRunning) {
+            var canvas: Canvas? = null
             // always give the system some time
             sleepIgnoreInterrupt(1)
             try {
@@ -45,8 +45,13 @@ abstract class GameLoopView(context: Context, attrs: AttributeSet? = null) : Sur
                     }
                 }
             } finally {
-                if (canvas != null)
-                    holder.unlockCanvasAndPost(canvas)
+                if (canvas != null) {
+                    try {
+                        holder.unlockCanvasAndPost(canvas)
+                    } catch (_: IllegalMonitorStateException) {
+                        // The surface can be torn down while the draw loop is stopping.
+                    }
+                }
             }
             sleepIfNeeded()
             updateFps()

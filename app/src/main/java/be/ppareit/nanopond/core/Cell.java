@@ -21,8 +21,6 @@ package be.ppareit.nanopond.core;
 
 import static be.ppareit.nanopond.core.NanoPond.POND_DEPTH;
 
-import net.vrallev.android.cat.Cat;
-
 public class Cell {
 
     public long generation;
@@ -84,7 +82,7 @@ public class Cell {
             } else if ('A' <= ch && ch <= 'F') {
                 genome[i] = (byte) (ch - 'A' + 10);
             } else {
-                Cat.e("Failed to parse hex string for the genome");
+                // This parse error should be logged from an Android-safe caller.
                 setRandomGenome();
             }
         }

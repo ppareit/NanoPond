@@ -126,9 +126,8 @@ public class NanoPond {
         return names[instruction];
     }
 
-    static private Report report = new Report();
-
     public Report getReport() {
+        Report report = new Report();
         report.year = clock;
         long totalActiveCells = 0;
         long totalEnergy = 0;
