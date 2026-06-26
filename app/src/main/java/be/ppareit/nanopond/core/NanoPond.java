@@ -21,14 +21,14 @@
  * Franklin St, Fifth Floor, Boston, MA 02110 USA
  *
  */
-package be.ppareit.nanopond;
+package be.ppareit.nanopond.core;
 
 import static java.lang.Thread.sleep;
 
 public class NanoPond {
 
     /* All available instructions */
-    String[] names = {"ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
+    private final String[] names = {"ZERO", "FWD", "BACK", "INC", "DEC", "READG", "WRITEG", "READB",
             "WRITEB", "LOOP", "REP", "TURN", "XCHG", "KILL", "SHARE", "STOP"};
     /*
      * Frequency of comprehensive reports-- lower values will provide more info while
@@ -111,15 +111,19 @@ public class NanoPond {
     PerReportStatCounters statCounters = new PerReportStatCounters();
     boolean replicatorMessage = false;
 
-    static class Report {
-        long year;
-        long energy;
-        long maxGeneration;
-        long activeCells;
-        long viableReplicators;
-        long kills;
-        long replaced;
-        long shares;
+    public static class Report {
+        public long year;
+        public long energy;
+        public long maxGeneration;
+        public long activeCells;
+        public long viableReplicators;
+        public long kills;
+        public long replaced;
+        public long shares;
+    }
+
+    public String getInstructionName(int instruction) {
+        return names[instruction];
     }
 
     static private Report report = new Report();

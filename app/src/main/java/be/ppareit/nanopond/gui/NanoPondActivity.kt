@@ -59,9 +59,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import be.ppareit.android.openRawTextFile
 import be.ppareit.nanopond.DetailListAdapter
-import be.ppareit.nanopond.NanoPond
 import be.ppareit.nanopond.R
 import be.ppareit.nanopond.ReportListAdapter
+import be.ppareit.nanopond.core.NanoPond
 import be.ppareit.nanopond.utils.isHex
 import net.vrallev.android.cat.Cat
 import java.io.IOException

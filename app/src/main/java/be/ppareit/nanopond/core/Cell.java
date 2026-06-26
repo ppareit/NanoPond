@@ -17,9 +17,9 @@
  *     Pieter Pareit - initial API and implementation
  ******************************************************************************/
 
-package be.ppareit.nanopond;
+package be.ppareit.nanopond.core;
 
-import static be.ppareit.nanopond.NanoPond.POND_DEPTH;
+import static be.ppareit.nanopond.core.NanoPond.POND_DEPTH;
 
 import net.vrallev.android.cat.Cat;
 

@@ -28,6 +28,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import be.ppareit.nanopond.core.Cell;
+import be.ppareit.nanopond.core.NanoPond;
 import be.ppareit.nanopond.gui.NanoPondView;
 
 public class DetailListAdapter extends BaseAdapter {
@@ -132,12 +134,11 @@ public class DetailListAdapter extends BaseAdapter {
     static private String disassemble(byte[] genome, NanoPond np) {
         StringBuilder out = new StringBuilder();
         for (int i = 0; i < genome.length; i++) {
-            out.append(i).append("\t").append(np.names[genome[i]]).append("\n");
+            out.append(i).append("\t").append(np.getInstructionName(genome[i])).append("\n");
         }
         return out.toString();
     }
 }
-
 
 
 

@@ -29,8 +29,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import be.ppareit.android.GameLoopView
-import be.ppareit.nanopond.Cell
-import be.ppareit.nanopond.NanoPond
+import be.ppareit.nanopond.core.Cell
+import be.ppareit.nanopond.core.NanoPond
 import net.vrallev.android.cat.Cat
 import kotlin.math.abs
 
@@ -260,7 +260,6 @@ class NanoPondView(
         }
     }
 }
-
 
 
 

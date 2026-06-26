@@ -25,7 +25,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package be.ppareit.nanopond;
+package be.ppareit.nanopond.core;
 
 import java.util.Random;
 
