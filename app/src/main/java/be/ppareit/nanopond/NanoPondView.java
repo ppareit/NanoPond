@@ -94,6 +94,10 @@ public class NanoPondView extends GameLoopView {
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
+    public State getMode() {
+        return mState;
+    }
+
     public void setMode(State mode) {
         if (mode == State.RUNNING && mState != State.RUNNING) {
             startGameLoop();
@@ -279,16 +283,3 @@ public class NanoPondView extends GameLoopView {
         return (alpha << 24) | (cap(red) << 16) | (cap(green) << 8) | cap(blue);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

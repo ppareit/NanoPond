@@ -40,6 +40,7 @@ public class NanoPondActivity extends Activity {
     private NanoPondView mGridView;
     private View mReportView;
     private View mDetailView;
+    private boolean mResumeRunning = false;
 
     /**
      * Called when the activity is first created.
@@ -49,7 +50,6 @@ public class NanoPondActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mNanopond = new NanoPond();
-        mNanopond.run();
 
         setContentView(R.layout.main);
         mMainView = findViewById(R.id.mainView);
@@ -71,6 +71,19 @@ public class NanoPondActivity extends Activity {
         mDetailView = findViewById(R.id.detailView);
         makeViewFloatable(mDetailView);
 
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (mGridView.getMode() == NanoPondView.State.RUNNING) {
+            menu.findItem(R.id.action_run).setVisible(false);
+            menu.findItem(R.id.action_pause).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_run).setVisible(true);
+            menu.findItem(R.id.action_pause).setVisible(false);
+        }
+        return true;
     }
 
     @Override
@@ -142,9 +155,11 @@ public class NanoPondActivity extends Activity {
         } else if (id == R.id.action_run) {
             mGridView.setMode(NanoPondView.State.RUNNING);
             mNanopond.run();
+            invalidateOptionsMenu();
         } else if (id == R.id.action_pause) {
             mGridView.setMode(NanoPondView.State.PAUSED);
             mNanopond.pauze();
+            invalidateOptionsMenu();
         } else if (id == R.id.action_editcell) {
             showDialog(DIALOG_EDIT_CELL);
         }
@@ -280,12 +295,17 @@ public class NanoPondActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        mResumeRunning = mGridView.getMode() == NanoPondView.State.RUNNING;
         mGridView.setMode(NanoPondView.State.PAUSED);
+        mNanopond.pauze();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mGridView.setMode(NanoPondView.State.RUNNING);
+        if (mResumeRunning) {
+            mGridView.setMode(NanoPondView.State.RUNNING);
+            mNanopond.run();
+        }
     }
 }
