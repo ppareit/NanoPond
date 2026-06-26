@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.view.SurfaceView
 import net.vrallev.android.cat.Cat
 
-abstract class GameLoopView(context: Context, attrs: AttributeSet) : SurfaceView(context, attrs),
+abstract class GameLoopView(context: Context, attrs: AttributeSet? = null) : SurfaceView(context, attrs),
     Runnable {
 
     private var isRunning = false

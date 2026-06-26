@@ -25,11 +25,9 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.DisplayMetrics
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.view.WindowManager
 import be.ppareit.android.GameLoopView
 import be.ppareit.nanopond.Cell
 import be.ppareit.nanopond.NanoPond
@@ -40,11 +38,19 @@ import kotlin.math.abs
 private const val MIN_SCALE = 1.0f
 private const val MAX_SCALE = 40.0f
 
-class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context, attrs) {
+class NanoPondView(
+    context: Context,
+    private val nanoPond: NanoPond,
+    attrs: AttributeSet? = null
+) : GameLoopView(context, attrs) {
+
+    constructor(context: Context, attrs: AttributeSet) : this(
+        context,
+        (context as NanoPondActivity).nanoPond,
+        attrs
+    )
 
     private var state = State.PAUSED
-
-    private val nanoPond = (context as NanoPondActivity).nanoPond
 
     private val canvasPaint = Paint().apply { color = Color.GRAY }
     private val backgroundPaint = Paint().apply { color = Color.BLACK }
@@ -117,7 +123,7 @@ class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context
             val r = pts[1].toInt()
             Cat.d("Tapped: $c  $r")
 
-            if (c in 0..NanoPond.POND_SIZE_X && r in 0..NanoPond.POND_SIZE_Y) {
+            if (c in 0 until NanoPond.POND_SIZE_X && r in 0 until NanoPond.POND_SIZE_Y) {
                 activeCellCol = c
                 activeCellRow = r
             }
@@ -219,14 +225,10 @@ class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context
 
         Cat.d("size changed")
 
+        drawMatrix.reset()
         drawMatrix.postTranslate(-NanoPond.POND_SIZE_X / 2f, -NanoPond.POND_SIZE_Y / 2f)
 
-        // scale to display metrics
-        val metrics = DisplayMetrics()
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        wm.defaultDisplay.getMetrics(metrics)
-
-        val scale = 4 * metrics.density
+        val scale = 4 * resources.displayMetrics.density
         drawMatrix.postScale(scale, scale)
         Cat.d("Size changed, new scale: $scale")
 
@@ -258,9 +260,6 @@ class NanoPondView(context: Context, attrs: AttributeSet) : GameLoopView(context
         }
     }
 }
-
-
-
 
 
 
