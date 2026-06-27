@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "be.ppareit.nanopond"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "be.ppareit.nanopond"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 30001
         versionName = "3.0.1"
 
